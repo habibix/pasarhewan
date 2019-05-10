@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateUserDetail extends Migration
+class CreateReportPost extends Migration
 {
     /**
      * Run the migrations.
@@ -13,18 +13,11 @@ class CreateUserDetail extends Migration
      */
     public function up()
     {
-        Schema::create('user_detail', function (Blueprint $table) {
+        Schema::create('report_post', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->string('gender', 10);
-            $table->date('date_birth');
-            $table->string('no_hp', 13);
-            $table->string('no_wa', 13);
-            $table->string('about', 150);
-            $table->string('provinsi', 150);
-            $table->string('kab_kota', 150);
-            $table->string('kecamatan', 150);
-            $table->string('desa', 150);
+            $table->unsignedInteger('post_id')->references('id')->on('post')->onDelete('cascade');
+            $table->string('detail', 200);
             $table->timestamps();
         });
     }
@@ -36,6 +29,6 @@ class CreateUserDetail extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('user_detail');
+        Schema::dropIfExists('report_post');
     }
 }

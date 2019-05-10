@@ -15,7 +15,7 @@ class CreateImage extends Migration
     {
         Schema::create('image', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('post_id');
+            $table->unsignedInteger('post_id')->references('id')->on('post')->onDelete('cascade');
             $table->string('image', 100);
             $table->timestamps();
         });

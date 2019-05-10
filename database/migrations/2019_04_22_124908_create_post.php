@@ -15,9 +15,9 @@ class CreatePost extends Migration
     {
         Schema::create('post', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('user_id')->references('id')->on('users')->onDelete('cascade');;
-            $table->integer('category_id');
-            $table->longText('post');
+            $table->unsignedInteger('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->unsignedInteger('category_id')->references('id')->on('category')->onDelete('cascade');
+            $table->longText('post_content');
             $table->timestamps();
         });
     }

@@ -15,9 +15,9 @@ class CreateComment extends Migration
     {
         Schema::create('comment', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('post_id');
-            $table->integer('user_id');
-            $table->text('comment');
+            $table->unsignedInteger('post_id')->references('id')->on('post')->onDelete('cascade');
+            $table->unsignedInteger('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->text('comment_content');
             $table->timestamps();
         });
     }

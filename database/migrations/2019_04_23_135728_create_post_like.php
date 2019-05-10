@@ -15,8 +15,8 @@ class CreatePostLike extends Migration
     {
         Schema::create('post_like', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('user_id');
-            $table->integer('post_id');
+            $table->unsignedInteger('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->unsignedInteger('post_id')->references('id')->on('post')->onDelete('cascade');
             $table->timestamps();
         });
     }
