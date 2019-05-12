@@ -73,7 +73,7 @@ class PostController extends Controller
         //get post data
         $data = array(
             'user_id'       => $user_id,
-            'post'          => $request->post_text,
+            'post_content'          => $request->post_text,
             'category_id'   => $category_id
         );
 

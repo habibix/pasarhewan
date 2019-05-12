@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use JWTAuth;
 use JWTAuthException;
 use App\User;
+use App\Profile;
 
 
 class AuthController extends Controller
@@ -68,70 +69,42 @@ class AuthController extends Controller
             'message'=>'User created successfully',
             'data' => [
                 'token' => $token,
-                'user' => $data,
-                'point' => 0
+                'user' => $data
             ],
         ]);
     }
 
     public function registerDetail(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'gender' => 'required',
-            'date_birth' => 'required',
-            'no_hp' => 'required',
-            'no_wa' => 'required'
-        ], [
-            'gender.required' => 'Kelamin wajib di isi',
-            'no_hp.required' => 'No HP wajib di isi'
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => '422',
-                'data' => null,
-                'message' => $validator
-            ]);
-        }
-
-        $data = User::create([
-            'name' => $request['name'],
-            'email' => $request['email'],
-            'password' => bcrypt($request['password']),
-            'role' => 'member'
-        ]);
-
-        $credentials = [
-            'email' => $request['email'],
-            'password' => $request['password']
-        ];
-
-        $token = null;
         try {
-            if (!$token = JWTAuth::attempt($credentials)) {
-                return response()->json([
-                    'status' => 500,
-                    'data' => null,
-                    'message' => 'Email atau Password Salah',
-                ]);
-            }
-        } catch (JWTAuthException $e) {
+            $user = JWTAuth::toUser($request->token);
+
+            $data = Profile::create([
+                'user_id' => $request['user_id'],
+                'gender' => $request['gender'],
+                'date_birth' => $request['date_birth'],
+                'no_hp' => $request['no_hp'],
+                'no_wa' => $request['no_wa'],
+                'about' => $request['about'],
+                'provinsi' => $request['provinsi'],
+                'kab_kota' => $request['kab_kota'],
+                'kecamatan' => $request['kecamatan'],
+                'desa' => $request['desa']
+            ]);
+
+            return response()->json([
+                'status' => 200,
+                'data' => $data,
+                'message' => 'update sukses'
+            ]);
+
+        } catch (Exception $e) {
             return response()->json([
                 'status' => 500,
                 'data' => null,
-                'message' => 'failed_to_create_token',
+                'message' => $e->getMessage()
             ]);
         }
-
-        return response()->json([
-            'status' => 200,
-            'message'=>'User created successfully',
-            'data' => [
-                'token' => $token,
-                'user' => $data,
-                'point' => 0
-            ],
-        ]);
     }
 
     public function login(Request $request){
@@ -160,8 +133,7 @@ class AuthController extends Controller
             'message'=>'User login successfully',
             'data' => [
                 'token' => $token,
-                'user' => $user,
-                'point' => $point
+                'user' => $user
             ],
         ]);
     }
