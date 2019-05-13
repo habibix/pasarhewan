@@ -1,87 +1,190 @@
 <!DOCTYPE html>
-<html lang="{{ app()->getLocale() }}">
+<html lang="en">
+
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8" />
+    <title>Anishop - Situs Jual Beli Hewan Piara Online</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="Situs Jual Beli Binatang Hewan Peliharaan Online" name="description" />
+    <meta content="Anishop" name="author" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- App favicon -->
+    <link rel="shortcut icon" href="asset/images/favicon.ico">
 
-    <!-- CSRF Token -->
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <!-- App css -->
+    <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/icons.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/app.min.css') }}" rel="stylesheet" type="text/css" />
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
-
-    <!-- Styles -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-    <script type="text/javascript" hr></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
-
-    @yield('header-script')
+    @yield('header')
 
 </head>
+
 <body>
-    <div id="app">
-        <nav class="navbar navbar-default navbar-static-top">
-            <div class="container">
-                <div class="navbar-header">
 
-                    <!-- Collapsed Hamburger -->
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#app-navbar-collapse" aria-expanded="false">
-                        <span class="sr-only">Toggle Navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
+    <!-- Begin page -->
+    <div id="wrapper">
+        
+        @include('layouts.navbar')
 
-                    <!-- Branding Image -->
-                    <a class="navbar-brand" href="{{ url('/') }}">
-                        {{ config('app.name', 'Laravel') }}
-                    </a>
-                </div>
-
-                <div class="collapse navbar-collapse" id="app-navbar-collapse">
-                    <!-- Left Side Of Navbar -->
-                    <ul class="nav navbar-nav">
-                        &nbsp;
-                    </ul>
-
-                    <!-- Right Side Of Navbar -->
-                    <ul class="nav navbar-nav navbar-right">
-                        <!-- Authentication Links -->
-                        @guest
-                            <li><a href="{{ route('login') }}">Login</a></li>
-                            <li><a href="{{ route('register') }}">Register</a></li>
-                        @else
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" v-pre>
-                                    {{ Auth::user()->name }} <span class="caret"></span>
-                                </a>
-
-                                <ul class="dropdown-menu">
-                                    <li>
-                                        <a href="{{ route('logout') }}"
-                                            onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
-                                            Logout
-                                        </a>
-
-                                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                                            {{ csrf_field() }}
-                                        </form>
-                                    </li>
-                                </ul>
-                            </li>
-                        @endguest
-                    </ul>
-                </div>
-            </div>
-        </nav>
-
+        <!-- ============================================================== -->
+        <!-- Start Page Content here -->
+        <!-- ============================================================== -->
+        
         @yield('content')
+
+        <!-- ============================================================== -->
+        <!-- End Page Content here -->
+        <!-- ============================================================== -->
+
+        @include('layouts.footer')
     </div>
 
-    <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}"></script>
-    @yield('footer-script')
+    <!-- ============================================================== -->
+    <!-- End Page content -->
+    <!-- ============================================================== -->
+
+    </div>
+    <!-- END wrapper -->
+
+    <!-- Right Sidebar -->
+    <div class="right-bar">
+        <div class="rightbar-title">
+            <a href="javascript:void(0);" class="right-bar-toggle float-right">
+                <i class="dripicons-cross noti-icon"></i>
+            </a>
+            <h5 class="m-0 text-white">Settings</h5>
+        </div>
+        <div class="slimscroll-menu">
+            <!-- User box -->
+            <div class="user-box">
+                <div class="user-img">
+                    <img src="{{ asset('images/users/user-1.jpg') }}" alt="user-img" title="Mat Helme" class="rounded-circle img-fluid">
+                    <a href="javascript:void(0);" class="user-edit"><i class="mdi mdi-pencil"></i></a>
+                </div>
+
+                <h5><a href="javascript: void(0);">Geneva Kennedy</a> </h5>
+                <p class="text-muted mb-0"><small>Admin Head</small></p>
+            </div>
+
+            <!-- Settings -->
+            <hr class="mt-0" />
+            <h5 class="pl-3">Basic Settings</h5>
+            <hr class="mb-0" />
+
+            <div class="p-3">
+                <div class="checkbox checkbox-primary mb-2">
+                    <input id="Rcheckbox1" type="checkbox" checked>
+                    <label for="Rcheckbox1">
+                        Notifications
+                    </label>
+                </div>
+                <div class="checkbox checkbox-primary mb-2">
+                    <input id="Rcheckbox2" type="checkbox" checked>
+                    <label for="Rcheckbox2">
+                        API Access
+                    </label>
+                </div>
+                <div class="checkbox checkbox-primary mb-2">
+                    <input id="Rcheckbox3" type="checkbox">
+                    <label for="Rcheckbox3">
+                        Auto Updates
+                    </label>
+                </div>
+                <div class="checkbox checkbox-primary mb-2">
+                    <input id="Rcheckbox4" type="checkbox" checked>
+                    <label for="Rcheckbox4">
+                        Online Status
+                    </label>
+                </div>
+                <div class="checkbox checkbox-primary mb-0">
+                    <input id="Rcheckbox5" type="checkbox" checked>
+                    <label for="Rcheckbox5">
+                        Auto Payout
+                    </label>
+                </div>
+            </div>
+
+            <!-- Timeline -->
+            <hr class="mt-0" />
+            <h5 class="pl-3 pr-3">Messages <span class="float-right badge badge-pill badge-danger">25</span></h5>
+            <hr class="mb-0" />
+            <div class="p-3">
+                <div class="inbox-widget">
+                    <div class="inbox-item">
+                        <div class="inbox-item-img"><img src="{{ asset('images/users/user-2.jpg') }}" class="rounded-circle" alt=""></div>
+                        <p class="inbox-item-author"><a href="javascript: void(0);" class="text-dark">Tomaslau</a></p>
+                        <p class="inbox-item-text">I've finished it! See you so...</p>
+                    </div>
+                    <div class="inbox-item">
+                        <div class="inbox-item-img"><img src="{{ asset('images/users/user-3.jpg') }}" class="rounded-circle" alt=""></div>
+                        <p class="inbox-item-author"><a href="javascript: void(0);" class="text-dark">Stillnotdavid</a></p>
+                        <p class="inbox-item-text">This theme is awesome!</p>
+                    </div>
+                    <div class="inbox-item">
+                        <div class="inbox-item-img"><img src="{{ asset('images/users/user-4.jpg') }}" class="rounded-circle" alt=""></div>
+                        <p class="inbox-item-author"><a href="javascript: void(0);" class="text-dark">Kurafire</a></p>
+                        <p class="inbox-item-text">Nice to meet you</p>
+                    </div>
+
+                    <div class="inbox-item">
+                        <div class="inbox-item-img"><img src="{{ asset('images/users/user-5.jpg') }}" class="rounded-circle" alt=""></div>
+                        <p class="inbox-item-author"><a href="javascript: void(0);" class="text-dark">Shahedk</a></p>
+                        <p class="inbox-item-text">Hey! there I'm available...</p>
+                    </div>
+                    <div class="inbox-item">
+                        <div class="inbox-item-img"><img src="{{ asset('images/users/user-6.jpg') }}" class="rounded-circle" alt=""></div>
+                        <p class="inbox-item-author"><a href="javascript: void(0);" class="text-dark">Adhamdannaway</a></p>
+                        <p class="inbox-item-text">This theme is awesome!</p>
+                    </div>
+                </div>
+                <!-- end inbox-widget -->
+            </div>
+            <!-- end .p-3-->
+
+        </div>
+        <!-- end slimscroll-menu-->
+    </div>
+    <!-- /Right-bar -->
+
+    <!-- Right bar overlay-->
+    <div class="rightbar-overlay"></div>
+
+    @yield('footer')
+
+    <!-- Vendor js -->
+    <script src="{{ asset('js/vendor.min.js') }}"></script>
+
+    <!-- App js -->
+    <script src="{{ asset('js/app.min.js') }}"></script>
+
+    <script>
+        $(function() {
+            // Multiple images preview in browser
+            var imagesPreview = function(input, placeToInsertImagePreview) {
+
+                if (input.files) {
+                    var filesAmount = input.files.length;
+
+                    for (i = 0; i < filesAmount; i++) {
+                        var reader = new FileReader();
+
+                        reader.onload = function(event) {
+                            $($.parseHTML('<img width="100">')).attr('src', event.target.result).appendTo(placeToInsertImagePreview);
+                        }
+
+                        reader.readAsDataURL(input.files[i]);
+                    }
+                }
+
+            };
+
+            $('#gallery-photo-add').on('change', function() {
+                imagesPreview(this, 'div.gallery');
+            });
+        });
+    </script>
+
 </body>
+
 </html>

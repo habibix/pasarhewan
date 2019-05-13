@@ -48,20 +48,21 @@
                 <div class="panel panel-default">
                 <div class="panel-body">
                   <div class="form-group">
-                    <label>{{ strtoupper($post->category->category) }}</label>
+                    <label>{{ $post['category'] }}</label>
                   </div>
                   <div class="form-group">
-                    @if(array_search($post->id, $images))
-                      in arrayy
-                    @endif
                         <img src="https://pengicau.net/wp-content/uploads/2018/11/Harga-Lovebird-Perso.jpg" alt="image" class="img-circle ipl">
-                        <label class="name-p">{{ $post->user->name }}</label>
+                        <label class="name-p">{{ $post['user'] }}</label>
                         <i class="dots fa fa-ellipsis-h pull-right"></i>
                   </div>
 
                   <div class="form-group">
-                        <img src="https://pengicau.net/wp-content/uploads/2018/11/Harga-Lovebird-Perso.jpg" alt="image" class="w-100">
-                          <p class="post">{{ $post->post }}</p>
+                        @if(count($post['image']) > 0 )
+                          @foreach($post['image'] as $image)
+                          <img src="{{ url('/uploads') }}/{{ $image['image'] }}" alt="image" class="w-100">
+                          @endforeach
+                        @endif
+                          <p class="post">{{ $post['post_content'] }}</p>
                   </div>
                 </div>
                 <div class="panel-footer">
@@ -89,8 +90,4 @@
         </div>
     </div>
 </div>
-@endsection
-
-@section('footer-script')
-
 @endsection

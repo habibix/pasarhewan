@@ -31,15 +31,28 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::all();
+
         $categories = Category::all();
-        $images = Image::all()->toArray();
+        $posts = Post::all();
+
+        foreach ($posts as $post) {
+
+            $image = $post->image;
+
+            $data[] = [
+                'post_id' => $post->id,
+                'user_id' => $post->user_id,
+                'category_id' => $post->category_id,
+                'user' => $post->user->name,
+                'category' => $post->category->category,
+                'post_content' => $post->post_content,
+                'image' => $image
+            ];
+        }
         
-        return view('home')
-            ->with('posts', $posts)
-            ->with('images', $images)
+        return view('page.index')
+            ->with('posts', $data)
             ->with('categories', $categories);
-        //return view('home');
     }
 
     /**
@@ -73,7 +86,7 @@ class PostController extends Controller
         //get post data
         $data = array(
             'user_id'       => $user_id,
-            'post_content'          => $request->post_text,
+            'post_content'  => $request->post_text,
             'category_id'   => $category_id
         );
 
@@ -94,10 +107,10 @@ class PostController extends Controller
             foreach ($images as $image => $img) {
 
                 //naming image
-                $image_name = $user_id.'_'.$category_id.'_'.time().'_'.$num;
+                $image_name = $user_id.'_'.$category_id.'_'.time().'_'.$num.'.'.$img->getClientOriginalExtension();
 
                 //move image to storage
-                $img->move($path, $image_name.'.'.$img->getClientOriginalExtension());
+                $img->move($path, $image_name);
 
                 //retriving imag data
                 $dataimage = array (

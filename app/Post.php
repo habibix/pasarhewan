@@ -27,4 +27,8 @@ class Post extends Model
 	function category(){
 		return $this->belongsTo('App\Category');
 	}
+
+	function image(){
+		return $this->hasMany(Image::class);
+	}
 }
