@@ -42,6 +42,10 @@ class AuthController extends Controller
             'role' => 'member'
         ]);
 
+        Profile::create([
+            'user_id' => $data->id,
+        ]);
+
         $credentials = [
             'email' => $request['email'],
             'password' => $request['password']

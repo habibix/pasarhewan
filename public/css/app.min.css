@@ -17,4 +17,5 @@
 .container{margin-top: 95px;}
 .content-text{padding-left: 1.5rem;}
 .card-body{padding: 1.5rem 1.5rem 0 1.5rem;}
-.carousel{margin-bottom: 1rem}
+.align-right{text-align: right !important;}
+

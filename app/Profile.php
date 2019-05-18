@@ -20,4 +20,8 @@ class Profile extends Model
         'kecamatan',
         'desa',
     ];
+
+    function user(){
+        return $this->belongsTo('App\User');
+    }
 }

@@ -31,4 +31,8 @@ class Post extends Model
 	function image(){
 		return $this->hasMany(Image::class);
 	}
+
+	function comment(){
+		return $this->hasMany(Comment::class);
+	}
 }

@@ -2,6 +2,12 @@
 <div class="navbar-custom">
     <ul class="list-unstyled topnav-menu float-right mb-0">
 
+        @guest
+            
+            <li class="d-none d-sm-block"><a class="nav-link" href="{{ route('login') }}">Login</a></li>
+            <li class="d-none d-sm-block"><a class="nav-link" href="{{ route('register') }}">Register</a></li>
+
+        @else
         <li class="d-none d-sm-block">
             <form class="app-search">
                 <div class="app-search-box">
@@ -108,13 +114,15 @@
             </div>
         </li>
 
-        <li class="dropdown notification-list">
+            <li class="dropdown notification-list">
+
             <a class="nav-link dropdown-toggle nav-user mr-0 waves-effect waves-light" data-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
                 <img src="{{asset('images/users/user-1.jpg')}}" alt="user-image" class="rounded-circle">
                 <span class="pro-user-name ml-1">
-                                Geneva <i class="mdi mdi-chevron-down"></i> 
-                            </span>
+                    {{ Auth::user()->name }} <i class="mdi mdi-chevron-down"></i> 
+                </span>
             </a>
+
             <div class="dropdown-menu dropdown-menu-right profile-dropdown ">
                 <!-- item-->
                 <div class="dropdown-header noti-title">
@@ -122,13 +130,13 @@
                 </div>
 
                 <!-- item-->
-                <a href="profile.html" class="dropdown-item notify-item">
+                <a href="{{ url('profile') }}/{{ Auth::user()->id }}" class="dropdown-item notify-item">
                     <i class="fe-user"></i>
-                    <span>My Account</span>
+                    <span>My Profile</span>
                 </a>
 
                 <!-- item-->
-                <a href="javascript:void(0);" class="dropdown-item notify-item">
+                <a href="{{ url('profile') }}/{{ Auth::user()->id }}/edit" class="dropdown-item notify-item">
                     <i class="fe-settings"></i>
                     <span>Settings</span>
                 </a>
@@ -142,20 +150,20 @@
                 <div class="dropdown-divider"></div>
 
                 <!-- item-->
-                <a href="javascript:void(0);" class="dropdown-item notify-item">
+                <a href="{{ route('logout') }}" class="dropdown-item notify-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                     <i class="fe-log-out"></i>
                     <span>Logout</span>
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">{{ csrf_field() }} </form>
                 </a>
 
             </div>
         </li>
-
         <li class="dropdown notification-list">
             <a href="javascript:void(0);" class="nav-link right-bar-toggle waves-effect waves-light">
                 <i class="fe-settings noti-icon"></i>
             </a>
         </li>
-
+        @endguest
     </ul>
 
     <!-- LOGO -->
