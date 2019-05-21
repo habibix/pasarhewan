@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use DB;
 use Auth;
 use App\Post;
 use App\Image;
@@ -51,6 +52,8 @@ class PostController extends Controller
                 'image' => $image
             ];
         }
+
+
         
         return view('page.index')
             ->with('posts', $data)
@@ -87,7 +90,7 @@ class PostController extends Controller
         }
 
         //retriving data
-        $user_id = Auth::user()->id;;
+        $user_id = Auth::user()->id;
         $category_id = $request->post_category;
         $path = base_path() . '/public/uploads/';
 
@@ -152,34 +155,45 @@ class PostController extends Controller
         $comments = $post->comment;
 
         foreach ($comments as $comment) {
-            $comments[] = [
+            $commentss[] = [
                 "comment_id" => $comment['id'],
                 "comment_post_id" => $comment['post_id'],
                 "comment_user_id" => $comment['user_id'],
-                "comment_user" => $comment->user['name'],
+                "comment_user" => $comment->user['name']." ".$comment->user['name_second'],
                 "comment_content" => $comment['comment_content'],
                 "created_at" => $comment['created_at'],
                 "updated_at" => $comment['updated_at'],
             ];
         }
 
-        $data = [
-            'post_id' => $post->id,
-            'user_id' => $post->user_id,
-            'category_id' => $post->category_id,
-            'user' => $post->user->name,
-            'category' => $post->category->category,
-            'post_content' => $post->post_content,
-            'comments' => $comments,
-            'image' => $image
-        ];
+        if(count($comments) > 0){
+            $data = [
+                'post_id' => $post->id,
+                'user_id' => $post->user_id,
+                'category_id' => $post->category_id,
+                'user' => $post->user->name." ".$post->user->name_second,
+                'category' => $post->category->category,
+                'post_content' => $post->post_content,
+                'comments' => $commentss,
+                'image' => $image
+            ];
 
-        
-        //dd($comment);
-        //echo $comment[0]['id'];
-        //return $data;
-        //return $data;
-        return view('page.post-detail')->with('post', $data);
+            return view('page.post-detail')->with('post', $data);
+
+        } else {
+            $data = [
+                'post_id' => $post->id,
+                'user_id' => $post->user_id,
+                'category_id' => $post->category_id,
+                'user' => $post->user->name,
+                'category' => $post->category->category,
+                'post_content' => $post->post_content,
+                'comments' => [],
+                'image' => $image
+            ];
+
+            return view('page.post-detail')->with('post', $data);
+        }
     }
 
     /**
@@ -222,60 +236,9 @@ class PostController extends Controller
      *
      * @param post_id
      */
-    public function postDetail($id)
-    {
-
-        echo "string";
-        /*$post = Post::find($id);
-
-        $image = $post->image;
-
-        $comments = $post->comment->all();
-
-        foreach ($comments as $comment) {
-            $comments[] = [
-                "comment_id" => $comment['id'],
-                "comment_post_id" => $comment['post_id'],
-                "comment_user_id" => $comment['user_id'],
-                "comment_user" => $comment->user['name'],
-                "comment_content" => $comment['comment_content'],
-                "created_at" => $comment['created_at'],
-                "updated_at" => $comment['updated_at'],
-            ];
-        }
-
-        $data_comment = [
-            "comment_id" => $comment->id,
-            "post_id" => $comment['post_id'],
-            "user_id" => $comment['user_id'],
-            "user" => $comment->user['name'],
-            "comment_content" => $comment['comment_content'],
-            "created_at" => $comment['created_at'],
-            "updated_at" => $comment['updated_at'],
-        ];
-
-        $data = [
-            'post_id' => $post->id,
-            'user_id' => $post->user_id,
-            'category_id' => $post->category_id,
-            'user' => $post->user->name,
-            'category' => $post->category->category,
-            'post_content' => $post->post_content,
-            'comments' => $comments,
-            'image' => $image
-        ];
-
-        
-        //dd($comment);
-        //echo $comment[0]['id'];
-        //return $data;
-        //return $data;
-        return view('page.post-detail')->with('post', $data);*/
-
-        
-    }
 
     public function profile($id){
+
         $user = User::find($id);
 
         $data = [
@@ -298,4 +261,141 @@ class PostController extends Controller
         return view('page.profile')
             ->with('user', $data);
     }
+
+    public function category(){
+        $categories = Category::all();
+        
+        return view('page.category')
+            ->with('categories', $categories);
+    }
+
+    public function categoryFilter($cat){
+
+        $categories = Category::all();
+        $cat = strtolower($cat);
+        $cat_id = Category::where('category', $cat)->first();
+        $posts = Post::where('category_id', $cat_id->id)->orderBy('created_at', 'DESC')->get();
+        
+
+        if(count($posts) > 0){
+            foreach ($posts as $post) {
+
+                $image = $post->image;
+
+                $data[] = [
+                    'post_id' => $post->id,
+                    'user_id' => $post->user_id,
+                    'category_id' => $post->category_id,
+                    'user' => $post->user->name,
+                    'user_full_name' => $post->user->name.' '.$post->user->name_second,
+                    'category' => $post->category->category,
+                    'post_content' => $post->post_content,
+                    'image' => $image
+                ];
+            
+            }
+
+            //return $data;
+            
+            return view('page.index')
+                ->with('posts', $data)
+                ->with('categories', $categories);
+
+        } else {
+
+            return view('page.index')
+            ->with('categories', $categories);
+        }
+    }
+
+    public function postComment(Request $request){
+
+        if(Auth::user()->id == $request->user_id){
+            //retriving imag data
+            $comment = array (
+                'post_id' => $request->post_id,
+                'user_id' => $request->user_id,
+                'comment_content' => $request->comment_content
+            );
+
+            //post image
+            $com = Comment::create($comment);
+
+            return redirect('post/'.$request->post_id);
+        }
+
+    }
+
+    //notif
+    public function notifications(){
+
+        $user_id = Auth::user()->id;
+        //select * from post, comment WHERE comment.post_id=post.id AND post.user_id=1 AND comment.user_id != 1
+
+        $comments = DB::table('comment')
+            ->join('users', 'users.id', '=', 'comment.user_id')
+            ->join('post', 'post.id', '=', 'comment.post_id')
+            ->where('post.user_id', '=', $user_id)
+            ->where('comment.user_id', '!=', $user_id)
+            ->select('comment.*', 'post.id', 'users.name', 'users.name_second')
+            ->get();
+
+            /*foreach ($comments as $comment) {
+                $com[] = [
+                    'id'=> $comment->id,
+                    'post_id'=> $comment->post_id,
+                    'user_id'=> $comment->user_id,
+                    'comment_content'=> $comment->comment_content,
+                    'comment_status'=> $comment->comment_status,
+                    'created_at'=> $comment->created_at,
+                    'updated_at'=> $comment->updated_at
+                ];
+            }*/
+
+        //return $comments;
+
+        return view('page.notifications')
+            ->with('comments', $comments);
+    }
+
+    public function showNotifications($what){
+
+        $user_id = Auth::user()->id;
+        //select * from post, comment WHERE comment.post_id=post.id AND post.user_id=1 AND comment.user_id != 1
+
+        $notif = DB::table('comment')
+            ->join('users', 'users.id', '=', 'comment.user_id')
+            ->join('post', 'post.id', '=', 'comment.post_id')
+            ->where('post.user_id', '=', $user_id)
+            ->where('comment.user_id', '!=', $user_id)
+            ->where('comment.comment_status', '=', 0)
+            ->select('comment.*', 'post.id', 'users.name', 'users.name_second')
+            ->get();
+
+            /*foreach ($comments as $comment) {
+                $com[] = [
+                    'id'=> $comment->id,
+                    'post_id'=> $comment->post_id,
+                    'user_id'=> $comment->user_id,
+                    'comment_content'=> $comment->comment_content,
+                    'comment_status'=> $comment->comment_status,
+                    'created_at'=> $comment->created_at,
+                    'updated_at'=> $comment->updated_at
+                ];
+            }*/
+
+        switch ($what) {
+            case 'nc':
+                return count($notif);
+                break;
+            
+            case 'nl':            
+                return $notif;
+                break;
+        }
+
+        /*return view('page.notifications')
+            ->with('comments', $comments);*/
+    }
+
 }

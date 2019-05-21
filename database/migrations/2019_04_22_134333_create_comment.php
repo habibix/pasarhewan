@@ -18,6 +18,7 @@ class CreateComment extends Migration
             $table->unsignedInteger('post_id')->references('id')->on('post')->onDelete('cascade');
             $table->unsignedInteger('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->text('comment_content');
+            $table->boolean('comment_status');
             $table->timestamps();
         });
     }

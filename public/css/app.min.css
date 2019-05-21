@@ -18,4 +18,8 @@
 .content-text{padding-left: 1.5rem;}
 .card-body{padding: 1.5rem 1.5rem 0 1.5rem;}
 .align-right{text-align: right !important;}
+.cat-list-p{margin: 0; padding: 0; list-style: none;}
+html {
+  scroll-behavior: smooth;
+}
 

@@ -150,8 +150,6 @@
     <!-- Right bar overlay-->
     <div class="rightbar-overlay"></div>
 
-    @yield('footer')
-
     <!-- Vendor js -->
     <script src="{{ asset('js/vendor.min.js') }}"></script>
 
@@ -184,6 +182,46 @@
             });
         });
     </script>
+
+    <script>
+        
+        $.ajax({
+            type: 'GET', //THIS NEEDS TO BE GET
+            url: 'http://127.0.0.1:8000/notif/nc',
+            success: function (data) {
+                var obj = JSON.parse(data);
+                console.log(data);
+                $(".noti-icon-badge").html(data)   //// For replace with previous one
+            },
+            error: function() { 
+                console.log(data);
+            }
+        });
+
+    </script>
+    <script type="text/javascript">
+        $('.noti-icon').on('click', function() {
+            $.ajax({
+                type: 'GET', //THIS NEEDS TO BE GET
+                url: 'http://127.0.0.1:8000/notif/nl',
+                success: function (data) {
+                    //var obj = JSON.parse(data);
+                    //console.log(data);
+                    $.each(data, function (key, val) {
+                        $(".noti-scroll").append('<a href="{{ url("post") }}/'+val.post_id+'" class="dropdown-item notify-item active"> <div class="notify-icon"> <img src="{{asset("images/users/user-1.jpg")}}" class="img-fluid rounded-circle" alt=""/> </div><p class="notify-details">'+val.name+' '+val.name_second+'</p><p class="text-muted mb-0 user-msg"> <small>'+val.comment_content+'</small> </p></a>');
+                       //console.log(val.comment_content);
+                    });
+                    //console.log(data);
+                    //$(".noti-icon-badge").html(data)   //// For replace with previous one
+                },
+                error: function() { 
+                    console.log(data);
+                }
+            });
+        });
+    </script>
+
+    @yield('footer')
 
 </body>
 

@@ -47,13 +47,43 @@
                             <div class="col-12">
                                 <div class="form-group">
                                     <label for="userbio">Bio</label>
-                                    <textarea class="form-control" id="userbio" rows="4" placeholder="Write something...">{{ $user->profile->about }}</textarea>
+                                    <textarea name="about" class="form-control" id="userbio" rows="4" placeholder="Write something...">{{ $user->profile->about }}</textarea>
                                 </div>
                             </div>
                             <!-- end col -->
                         </div>
                         <!-- end row -->
 
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="gender">Gender</label>
+                                    <select name="gender" class="form-control" id="gender">
+                                        <option value="{{ $user->profile->gender }}"> {{ ucfirst($user->profile->gender) }}</option>
+
+                                        @if(strtolower($user->profile->gender) == '')
+                                            <option value="laki-laki">Laki-laki</option>
+                                            <option value="perempuan">Perempuan</option>
+                                        @else
+                                            @if(strtolower($user->profile->gender) == 'perempuan'){
+                                                <option value="laki-laki">Laki-laki</option>
+                                            @else
+                                                <option value="perempuan">Perempuan</option>
+                                            @endif
+                                        @endif
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="date_birth">Tanggal Lahir</label>
+                                    <input class="form-control" id="date_birth" type="date" name="date_birth" value="{{ $user->profile->date_birth }}">
+                                </div>
+                            </div>
+                            <!-- end col -->
+                        </div>
+
+                        <h5 class="mb-4 text-uppercase"><i class="mdi mdi-account-circle mr-1"></i> Account Info</h5>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -76,74 +106,19 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="userpassword">Password</label>
-                                    <input type="new_password" class="form-control" id="userpassword" placeholder="Enter New password">
+                                    <input name="new_password" type="new_password" class="form-control" id="userpassword" placeholder="Enter New password">
                                 </div>
 
                                 <div class="form-group">
                                     <label for="userpassword">Password</label>
-                                    <input name="password" type="old_password" class="form-control" id="userpassword" placeholder="Enter password">
+                                    <input name="old_password" type="old_password" class="form-control" id="userpassword" placeholder="Enter password">
                                 </div>
 
                             </div>
                             <!-- end col -->
                         </div>
                         <!-- end row -->
-
-                        <h5 class="mb-3 text-uppercase bg-light p-2"><i class="mdi mdi-earth mr-1"></i> Social</h5>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="social-fb">Facebook</label>
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text"><i class="fab fa-facebook-square"></i></span>
-                                        </div>
-                                        <input type="text" class="form-control" id="social-fb" placeholder="Url">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="social-tw">Twitter</label>
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text"><i class="fab fa-twitter"></i></span>
-                                        </div>
-                                        <input type="text" class="form-control" id="social-tw" placeholder="Username">
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- end col -->
-                        </div>
-                        <!-- end row -->
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="social-insta">Instagram</label>
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text"><i class="fab fa-instagram"></i></span>
-                                        </div>
-                                        <input type="text" class="form-control" id="social-insta" placeholder="Url">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="social-lin">Linkedin</label>
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text"><i class="fab fa-linkedin"></i></span>
-                                        </div>
-                                        <input type="text" class="form-control" id="social-lin" placeholder="Url">
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- end col -->
-
-                        </div>
-                        <!-- end row -->
+                        
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="text-right">

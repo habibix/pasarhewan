@@ -1,14 +1,14 @@
 @extends('layouts.app') @section('content')
 <div class="container">
     <div class="d-flex justify-content-center">
-        <div class="col-lg-8 col-lx-8">
+        <div class="col-lg-6 col-lx-6">
 
             <div class="card">
                 <div class="card-body">
                     <div class="media">
                         <img class="mr-2 avatar-sm rounded-circle" src="http://127.0.0.1:8000/images/users/user-3.jpg" alt="Generic placeholder image">
                         <div class="media-body">
-                            <h5 class="m-0">{{ $post['user'] }}</h5>
+                            <h5 class="m-0"><strong><a href="{{ url('profile') }}/{{ $post['user_id'] }}">{{ $post['user'] }}</a></strong></h5>
                             <p class="text-muted"><small><a href="{{ url('post') }}/{{ $post['post_id'] }}">about 2 minuts ago</a></small></p>
                         </div>
                         <p class="text-muted"><small>burung</small></p>
@@ -62,14 +62,14 @@
                                     <img src="{{ asset('images/users/user-4.jpg') }}" class="avatar-sm rounded-circle" alt="Generic placeholder image">
                                 </a>
                                 <div class="media-body comment-block">
-                                    <span class="mt-0"><strong>{{ $value['comment_user'] }}</strong></span>
+                                    <span class="mt-0"><strong><a href="{{ url('/profile') }}/{{ $value['comment_user_id'] }}">{{ $value['comment_user'] }}</a></strong></span>
                                     <span>{{ $value['comment_content'] }}</span>
                                     <div><small class="text-muted">5 hours ago</small></div>
                                 </div>
                             </div>
                         @endforeach
                     </div>
-                    @endif
+                @endif
 
                 <div class="card-footer" style="padding-top: 6px;">
                     <div class="media mt-2">
@@ -77,12 +77,17 @@
                             <img src="http://127.0.0.1:8000/images/users/user-1.jpg" class="rounded-circle" alt="Generic placeholder image" height="31">
                         </a>
                         <div class="media-body">
-                            <div class="input-group">
-                                <input type="text" class="form-control" placeholder="Add Comment" aria-label="Add Comment">
-                                <div class="input-group-append">
-                                    <button class="btn btn-primary waves-effect waves-light" type="button">Send</button>
+                            <form method="post" action="{{ url('/comment') }}">
+                                <div class="input-group">
+                                    <input name="user_id" type="hidden" value="{{ Auth::user()->id }}">
+                                    <input name="post_id" type="hidden" value="{{ $post['post_id'] }}">
+                                    <input name="_token" type="hidden" value="{{ csrf_token() }}">
+                                    <input name="comment_content" type="text" class="form-control" placeholder="Add Comment" aria-label="Add Comment">
+                                    <div class="input-group-append">
+                                        <button type="submit" class="btn btn-primary waves-effect waves-light" type="button">Send</button>
+                                    </div>
                                 </div>
-                            </div>
+                            </form>
                         </div>
                     </div>
                 </div>

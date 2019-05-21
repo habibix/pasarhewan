@@ -107,12 +107,17 @@
                                     <img src="{{asset('images/users/user-1.jpg')}}" class="rounded-circle" alt="Generic placeholder image" height="31">
                                 </a>
                                 <div class="media-body">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control" placeholder="Add Comment" aria-label="Add Comment">
-                                        <div class="input-group-append">
-                                            <button class="btn btn-primary waves-effect waves-light" type="button">Send</button>
+                                    <form method="post" action="{{ url('/comment') }}">
+                                        <div class="input-group">
+                                            <input name="user_id" type="hidden" value="{{ Auth::user()->id }}">
+                                            <input name="post_id" type="hidden" value="{{ $post['post_id'] }}">
+                                            <input name="_token" type="hidden" value="{{ csrf_token() }}">
+                                            <input name="comment_content" type="text" class="form-control" placeholder="Add Comment" aria-label="Add Comment">
+                                            <div class="input-group-append">
+                                                <button type="submit" class="btn btn-primary waves-effect waves-light" type="button">Send</button>
+                                            </div>
                                         </div>
-                                    </div>
+                                    </form>
                                 </div>
                             </div>
                         </div>

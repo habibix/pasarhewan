@@ -24,6 +24,16 @@ Route::resource('post', 'PostController');
 Route::get('/post/{id}', 'PostController@postDetail')->name('post-detail');
 Route::get('/', 'PostController@index')->name('home');
 
+Route::get('/c', 'PostController@category')->name('category');
+Route::get('/c/{cat}', 'PostController@categoryFilter');
+
+// Comment
+Route::post('/comment', 'PostController@postComment');
+
+// Notif
+Route::get('/notifications', 'PostController@notifications');
+Route::get('/notif/{what}', 'PostController@showNotifications');
+
 // PROFILE ROUTE
 Route::resource('profile', 'ProfilController');
 //Route::get('/profile/{id}', 'ProfilController@profile')->name('profile');

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Hash;
+use Auth;
 use App\User;
 use App\Profile;
 use App\Post;
@@ -9,6 +11,8 @@ use App\Image;
 use App\Category;
 use App\Comment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Validator;
 
 class ProfilController extends Controller
 {
@@ -154,6 +158,10 @@ class ProfilController extends Controller
     public function edit($id)
     {
         $user = User::find($id);
+        if(Auth::user()->id != $id){
+            //return view('errors.404');
+            return response()->view('warning.404');
+        }
         return view('page.profile-edit')->with('user', $user);
     }
 
@@ -170,13 +178,14 @@ class ProfilController extends Controller
 
         request()->validate([
             'firstname' => 'required|string|max:255',
-            'lastname' => 'string|max:255',
+            'lastname' => 'max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' .$id,
             'no_hp' => 'required|string|max:15|unique:user_detail,no_hp, ' .$user->profile->id,
+            'no_wa' => 'required|string|max:15|unique:user_detail,no_wa, ' .$user->profile->id
         ]);
 
 
-        if ($request->password == NULL) {
+        if ($request->new_password == NULL) {
             
             $user->name = $request->firstname;
             $user->name_second = $request->lastname;
@@ -192,40 +201,39 @@ class ProfilController extends Controller
                 'provinsi' => $request->provinsi,
                 'kab_kota' => $request->kab_kota,
                 'kecamatan' => $request->kecamatan,
-                'user_id' => $request->user_id,
+                'user_id' => $id,
                 'desa' => $request->desa
             ]);
 
         } else {
-            $user->name = $request->name;
-            $user->name_second = $request->name_second;
-            $user->email = $request->email;
-            $user->password = bcrypt($request->password);
-            $user->save();
 
-            $user->profile->update([
-                'gender' => $request->gender,
-                'date_birth' => $request->date_birth,
-                'no_hp' => $request->no_hp,
-                'no_wa' => $request->no_wa,
-                'about' => $request->about,
-                'provinsi' => $request->provinsi,
-                'kab_kota' => $request->kab_kota,
-                'kecamatan' => $request->kecamatan,
-                'user_id' => $request->user_id,
-                'desa' => $request->desa
-            ]);
+            if(Hash::check($request->old_password, $user->password)) {
+                $user->name = $request->firstname;
+                $user->name_second = $request->lastname;
+                $user->email = $request->email;
+                $user->password = bcrypt($request->new_password);
+                $user->save();
+
+                $user->profile->update([
+                    'gender' => $request->gender,
+                    'date_birth' => $request->date_birth,
+                    'no_hp' => $request->no_hp,
+                    'no_wa' => $request->no_wa,
+                    'about' => $request->about,
+                    'provinsi' => $request->provinsi,
+                    'kab_kota' => $request->kab_kota,
+                    'kecamatan' => $request->kecamatan,
+                    'user_id' => $id,
+                    'desa' => $request->desa
+                ]);
+            } else {
+                return Redirect::back()->withErrors(['Password Lama Salah']);
+            }
         }
 
-        notify()->flash('Done!', 'success', [
-            'timer' => 1500,
-            'text' => 'Member successfully Edited',
-        ]);
-
         //return redirect()->back();
-        return redirect(route('profile.edit', compact($id)))->withErrors($validator);
-        //
-        echo "string";
+        return redirect(route('profile.edit', $id))->with('success', 'IT WORKS!');
+;
     }
 
     /**

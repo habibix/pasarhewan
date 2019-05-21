@@ -81,26 +81,29 @@
 <div class="card text-center">
     <div class="card-header">
         <ul class="nav nav-pills card-header-pills">
-            <li class="nav-item">
-                <a class="nav-link active" href="javascript:void(0);">Active</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="javascript:void(0);">Link</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="javascript:void(0);">Disabled</a>
-            </li>
             <li class="nav-item float-right">
-                <a class="nav-link card-link text-custom" href="javascript:void(0);">Lihat Selengkapnya</a>
+                <a class="nav-link card-link text-custom" href="/">Semua</a>
+            </li>
+
+            @foreach ($categories as $category)
+                <li class="nav-item">
+                    <a class="nav-link" href="{{url('c')}}/{{ $category->category }}">{{ ucfirst($category->category) }}</a>
+                </li>
+            @endforeach
+            
+            <li class="nav-item float-right">
+                <a class="nav-link card-link text-custom" href="{{ url('/c') }}">Lihat Selengkapnya</a>
             </li>
         </ul>
     </div>
     
 </div>
 
+@if(!empty($posts))
 <!-- TIMELINE START -->
+
 @foreach ($posts as $post)
-                    <div class="card">
+                    <div class="card" id="post-{{ $post['post_id'] }}">
                         <div class="card-body">
                             <div class="media">
                                 <img class="mr-2 avatar-sm rounded-circle" src="{{asset('images/users/user-3.jpg')}}" alt="Generic placeholder image">
@@ -164,31 +167,32 @@
                                     <img src="{{asset('images/users/user-1.jpg')}}" class="rounded-circle" alt="Generic placeholder image" height="31">
                                 </a>
                                 <div class="media-body">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control" placeholder="Add Comment" aria-label="Add Comment">
-                                        <div class="input-group-append">
-                                            <button class="btn btn-primary waves-effect waves-light" type="button">Send</button>
+                                    <form method="post" action="{{ url('/comment') }}">
+                                        <div class="input-group">
+                                            <input name="user_id" type="hidden" value="{{ Auth::user()->id }}">
+                                            <input name="post_id" type="hidden" value="{{ $post['post_id'] }}">
+                                            <input name="_token" type="hidden" value="{{ csrf_token() }}">
+                                            <input name="comment_content" type="text" class="form-control" placeholder="Add Comment" aria-label="Add Comment">
+                                            <div class="input-group-append">
+                                                <button type="submit" class="btn btn-primary waves-effect waves-light" type="button">Send</button>
+                                            </div>
                                         </div>
-                                    </div>
+                                    </form>
                                 </div>
                             </div>
                         </div>
                     </div>
 @endforeach
+
 <!-- TIMELINE END -->
+
+@else
+
+Belum ada postingan
+
+@endif
 
                 </div>
             </div>
         </div>
         @endsection
-@section('footer')
-<script type="text/javascript">
-$('.upload-btn').click(function() {
-    var input = $(document.createElement('input')); 
-    input.attr("type", "file");
-    input.trigger('click');
-    return false;
-});    
-</script>
-
-@endsection
