@@ -24,6 +24,8 @@ Route::resource('post', 'PostController');
 Route::get('/post/{id}', 'PostController@postDetail')->name('post-detail');
 Route::get('/', 'PostController@index')->name('home');
 
+Route::post('/post/like', 'PostController@like')->name('post-like');
+
 Route::get('/c', 'PostController@category')->name('category');
 Route::get('/c/{cat}', 'PostController@categoryFilter');
 
@@ -36,6 +38,10 @@ Route::get('/notif/{what}', 'PostController@showNotifications');
 
 // PROFILE ROUTE
 Route::resource('profile', 'ProfilController');
+
+Route::get('/test', function(){
+	echo $imagePath = url('/images/profile');
+});
 //Route::get('/profile/{id}', 'ProfilController@profile')->name('profile');
 //Route::get('/profile/edit/{id}', 'ProfilController@editProfile')->name('edit-profile');
 

@@ -13,6 +13,8 @@ use App\User;
 use App\Profile;
 use App\Post;
 use App\Image;
+use App\Like;
+use App\Comment;
 
 class PostController extends Controller
 {
@@ -23,8 +25,7 @@ class PostController extends Controller
         $this->post = new Post();
     }
 
-    public function post(Request $request)
-    {
+    public function post(Request $request) {
     	try {
             $user = JWTAuth::toUser($request->token);
 
@@ -46,5 +47,33 @@ class PostController extends Controller
                 'message' => $e->getMessage()
             ]);
         }
+    }
+
+    public function like(Request $request){
+
+        try {
+            $user = JWTAuth::toUser($request->token);
+
+            $like = array (
+                'post_id' => $request['post_id'],
+                'user_id' => $request['user_id']
+            );
+            
+            $like = Like::create($like);
+
+            return response()->json([
+                'status' => 200,
+                'data' => $like,
+                'message' => 'success'
+            ]);
+
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'data' => null,
+                'message' => $e->getMessage()
+            ]);
+        }
+        
     }
 }

@@ -22,9 +22,21 @@
             <div class="card">
                 <div class="card-body">
 
-                    <form method="POST" action="{{ route('profile.update', $user->id) }}">
+                    <form method="POST" action="{{ route('profile.update', $user->id) }}" enctype="multipart/form-data">
                         <input name="_method" type="hidden" value="PUT">
                         <input name="_token" type="hidden" value="{{ csrf_token() }}">
+
+                        <div class="text-center">
+                            @if($user->image_profile != NULL)
+                                <img src="{{ $user->image_profile }}" class="rounded-circle avatar-lg img-thumbnail avatar-xxl" id="imagePreview" alt="profile-image">
+                            @else
+                                <img src="https://coderthemes.com/ubold/layouts/purple/assets/images/users/user-1.jpg" class="rounded-circle avatar-lg img-thumbnail avatar-xxl" id="imagePreview" alt="profile-image">
+                            @endif
+                            
+                            <p><a href="javascript: void(0);" class="editLink" onclick="changeImage()">Ganti Foto</a></p>
+                            <input type="file" name="profile_picture" id="fileInput"  style="display:none"/>
+                        </div>
+
                         <h5 class="mb-4 text-uppercase"><i class="mdi mdi-account-circle mr-1"></i> Personal Info</h5>
                         <div class="row">
                             <div class="col-md-6">
@@ -139,4 +151,32 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('footer')
+
+<script type="text/javascript">
+
+$(document).ready(function(){
+  $(".editLink").on('click', function(e){
+        e.preventDefault();
+        $("#fileInput:hidden").trigger('click');
+    });
+});
+
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            
+            reader.onload = function (e) {
+                $('#imagePreview').attr('src', e.target.result);
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    $("#fileInput").change(function(){
+        readURL(this);
+    });
+</script>
+
 @endsection

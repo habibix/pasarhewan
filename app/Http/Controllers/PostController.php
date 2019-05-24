@@ -9,6 +9,7 @@ use App\Image;
 use App\User;
 use App\Category;
 use App\Comment;
+use App\Like;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
@@ -46,6 +47,7 @@ class PostController extends Controller
                 'user_id' => $post->user_id,
                 'category_id' => $post->category_id,
                 'user' => $post->user->name,
+                'profile_image' => $post->user->image_profile,
                 'user_full_name' => $post->user->name.' '.$post->user->name_second,
                 'category' => $post->category->category,
                 'post_content' => $post->post_content,
@@ -287,6 +289,7 @@ class PostController extends Controller
                     'user_id' => $post->user_id,
                     'category_id' => $post->category_id,
                     'user' => $post->user->name,
+                    'profile_image' => $post->user->image_profile,
                     'user_full_name' => $post->user->name.' '.$post->user->name_second,
                     'category' => $post->category->category,
                     'post_content' => $post->post_content,
@@ -386,16 +389,74 @@ class PostController extends Controller
 
         switch ($what) {
             case 'nc':
+
+                $notif = DB::table('comment')
+                    ->join('users', 'users.id', '=', 'comment.user_id')
+                    ->join('post', 'post.id', '=', 'comment.post_id')
+                    ->where('post.user_id', '=', $user_id)
+                    ->where('comment.user_id', '!=', $user_id)
+                    ->where('comment.comment_status', '=', 0)
+                    ->select('comment.*', 'post.id', 'users.name', 'users.name_second')
+                    ->get();
+
                 return count($notif);
                 break;
             
             case 'nl':            
+
+                $notif = DB::table('comment')
+                    ->join('users', 'users.id', '=', 'comment.user_id')
+                    ->join('post', 'post.id', '=', 'comment.post_id')
+                    ->where('post.user_id', '=', $user_id)
+                    ->where('comment.user_id', '!=', $user_id)
+                    ->select('comment.*', 'post.id', 'users.name', 'users.name_second')
+                    ->limit(5)
+                    ->get();
                 return $notif;
+                break;
+
+            case 'cn':  
+                
+                $update_status = array(
+                    'comment_status' => 1
+                );
+                
+                $notif = DB::table('comment')
+                    ->join('users', 'users.id', '=', 'comment.user_id')
+                    ->join('post', 'post.id', '=', 'comment.post_id')
+                    ->where('post.user_id', '=', $user_id)
+                    ->where('comment.user_id', '!=', $user_id)
+                    ->where('comment.comment_status', '=', 0)
+                    ->select('comment.*', 'post.id', 'users.name', 'users.name_second')
+                    ->update($update_status);
+            
                 break;
         }
 
         /*return view('page.notifications')
             ->with('comments', $comments);*/
+    }
+
+    public function like(Request $request){
+        
+        try {
+            $data = Like::create([
+                'post_id' => str_replace('post-', '', $request->post_id),
+                'user_id' => $request->user_id
+            ]);
+
+            return response()->json([
+                'status' => 200,
+                'data' => $data,
+                'message' => 'success'
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'data' => null,
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 
 }

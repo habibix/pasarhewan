@@ -8,6 +8,8 @@
     <meta content="Situs Jual Beli Binatang Hewan Peliharaan Online" name="description" />
     <meta content="Anishop" name="author" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <!-- App favicon -->
     <link rel="shortcut icon" href="asset/images/favicon.ico">
 
@@ -191,7 +193,9 @@
             success: function (data) {
                 var obj = JSON.parse(data);
                 console.log(data);
-                $(".noti-icon-badge").html(data)   //// For replace with previous one
+                if(data > 0)
+                    $("#noticon").append('<span class="badge badge-danger rounded-circle noti-icon-badge">'+data+'</span>')
+                //$(".noti-icon-badge").html(data)   //// For replace with previous one
             },
             error: function() { 
                 console.log(data);

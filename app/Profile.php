@@ -19,6 +19,7 @@ class Profile extends Model
         'kab_kota',
         'kecamatan',
         'desa',
+        'profile_image'
     ];
 
     function user(){

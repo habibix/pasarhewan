@@ -5,13 +5,17 @@
         <div class="col-lg-6 col-lx-6">
 
             <div class="card-box text-center">
-                <img src="{{ asset('images/users/user-1.jpg') }}" class="rounded-circle avatar-lg img-thumbnail" alt="profile-image">
+
+                @if($user['user_profile_image'] != NULL)
+                <img src="{{ $user['user_profile_image'] }}" class="rounded-circle avatar-lg img-thumbnail" alt="profile-image">
+                @else
+
+                <img src="https://3.bp.blogspot.com/-LPjYeDMJi5o/XOUSqoN6G9I/AAAAAAAADj8/8qM42tR95xsn-X556dFIUiJQKJc1de-5wCLcBGAs/s1600/blank-profile.jpg" class="rounded-circle avatar-lg img-thumbnail" alt="profile-image">
+                @endif
+                
 
                 <h4 class="mb-0">{{ $user['user_name'] }}</h4>
                 <p class="text-muted">{{ $user['user_about'] }}</p>
-
-                <button type="button" class="btn btn-success btn-xs waves-effect mb-2 waves-light">Follow</button>
-                <button type="button" class="btn btn-danger btn-xs waves-effect mb-2 waves-light">Message</button>
 
                 <div class="text-left mt-3">
                     <p class="text-muted mb-2 font-13"><strong>Full Name :</strong> <span class="ml-2">{{ $user['user_full_name'] }}</span></p>
@@ -23,20 +27,6 @@
                     <p class="text-muted mb-1 font-13"><strong>Location :</strong> <span class="ml-2">{{ $user['user_kab_kota'] }}</span></p>
                 </div>
 
-                <ul class="social-list list-inline mt-3 mb-0">
-                    <li class="list-inline-item">
-                        <a href="javascript: void(0);" class="social-list-item border-primary text-primary"><i class="mdi mdi-facebook"></i></a>
-                    </li>
-                    <li class="list-inline-item">
-                        <a href="javascript: void(0);" class="social-list-item border-danger text-danger"><i class="mdi mdi-google"></i></a>
-                    </li>
-                    <li class="list-inline-item">
-                        <a href="javascript: void(0);" class="social-list-item border-info text-info"><i class="mdi mdi-twitter"></i></a>
-                    </li>
-                    <li class="list-inline-item">
-                        <a href="javascript: void(0);" class="social-list-item border-secondary text-secondary"><i class="mdi mdi-github-circle"></i></a>
-                    </li>
-                </ul>
             </div>
             <!-- end card-box -->
 
@@ -46,7 +36,11 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="media">
-                                <img class="mr-2 avatar-sm rounded-circle" src="{{asset('images/users/user-3.jpg')}}" alt="Generic placeholder image">
+                                @if($post['profile_image'] != NULL)
+                                <img class="mr-2 avatar-sm rounded-circle" src="{{ $user['profile_image'] }}" alt="Generic placeholder image">
+                                @else
+                                <img class="mr-2 avatar-sm rounded-circle" src="https://3.bp.blogspot.com/-LPjYeDMJi5o/XOUSqoN6G9I/AAAAAAAADj8/8qM42tR95xsn-X556dFIUiJQKJc1de-5wCLcBGAs/s1600/blank-profile.jpg" alt="Generic placeholder image">
+                                @endif
                                 <div class="media-body">
                                     <h5 class="m-0">{{ $post['user'] }}</h5>
                                     <p class="text-muted"><small><a href="{{ url('post') }}/{{ $post['post_id'] }}">about 2 minuts ago</a></small></p>
@@ -103,9 +97,9 @@
 
                         <div class="card-footer" style="padding-top: 6px;">
                             <div class="media mt-2">
-                                <a class="pr-2" href="#">
-                                    <img src="{{asset('images/users/user-1.jpg')}}" class="rounded-circle" alt="Generic placeholder image" height="31">
-                                </a>
+<!--                                 <a class="pr-2" href="#">
+                                    <img src="{{ Auth::user()->image_profile }}" class="rounded-circle" alt="Generic placeholder image" height="31">
+                                </a> -->
                                 <div class="media-body">
                                     <form method="post" action="{{ url('/comment') }}">
                                         <div class="input-group">

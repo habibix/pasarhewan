@@ -24,9 +24,9 @@
         </li>
 
         <li class="dropdown notification-list notif-icon">
-            <a class="nav-link dropdown-toggle  waves-effect waves-light" data-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
+            <a id="noticon" class="nav-link dropdown-toggle waves-effect waves-light" data-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
                 <i class="fe-bell noti-icon"></i>
-                <span class="badge badge-danger rounded-circle noti-icon-badge">6</span>
+                
             </a>
             <div class="dropdown-menu dropdown-menu-right dropdown-lg">
 
@@ -34,14 +34,14 @@
                 <div class="dropdown-item noti-title">
                     <h5 class="m-0">
                                     <span class="float-right">
-                                        <a href="" class="text-dark">
+                                        <a href="javascript: void(0);" onclick="clearNotif()" class="text-dark">
                                             <small>Clear All</small>
                                         </a>
                                     </span>Notification
                                 </h5>
                 </div>
 
-                <div class="slimscroll noti-scroll">
+                <div class="slimscroll noti-scroll" style="height: 200px">
 
                 </div>
 
@@ -57,7 +57,7 @@
             <li class="dropdown notification-list">
 
             <a class="nav-link dropdown-toggle nav-user mr-0 waves-effect waves-light" data-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
-                <img src="{{asset('images/users/user-1.jpg')}}" alt="user-image" class="rounded-circle">
+                <img src="{{ Auth::user()->image_profile }}" alt="user-image" class="rounded-circle">
                 <span class="pro-user-name ml-1">
                     {{ Auth::user()->name }} <i class="mdi mdi-chevron-down"></i> 
                 </span>
@@ -132,3 +132,23 @@
     </ul>
 </div>
 <!-- end Topbar -->
+
+@section('footer')
+<script type="text/javascript">
+    function clearNotif(){
+        $.ajax({
+            type: 'GET', //THIS NEEDS TO BE GET
+            url: 'http://127.0.0.1:8000/notif/cn',
+            success: function (data) {
+                console.log(data);
+                $(".noti-icon-badge").remove();
+                //$("#noticon").append('<span class="badge badge-danger rounded-circle noti-icon-badge">'+data+'</span>')
+                //$(".noti-icon-badge").html(data)   //// For replace with previous one
+            },
+            error: function() { 
+                console.log(data);
+            }
+        });
+    }
+</script>
+@endsection

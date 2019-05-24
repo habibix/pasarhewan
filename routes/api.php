@@ -29,5 +29,6 @@ Route::group(['prefix' => 'v1','middleware' => ['api','cors']], function () {
     Route::group(['middleware' => 'jwt.auth'], function () {
     	Route::post('auth/profile', 'Api\Auth\AuthController@registerDetail');
         Route::post('post', 'Api\PostController@post');
+        Route::post('post/like', 'Api\PostController@like');
     });
 });

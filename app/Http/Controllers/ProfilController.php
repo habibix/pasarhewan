@@ -116,6 +116,7 @@ class ProfilController extends Controller
             'user_birth' => $user->profile->date_birth,
             'user_no' => $user->profile->no_hp,
             'user_wa' => $user->profile->no_wa,
+            'user_profile_image' => $user->image_profile,
             'user_about' => $user->profile->about,
             'user_provinsi' => $user->profile->provinsi,
             'user_kab_kota' => $user->profile->kab_kota,
@@ -137,6 +138,7 @@ class ProfilController extends Controller
                 'user_id' => $post->user_id,
                 'category_id' => $post->category_id,
                 'user' => $post->user->name,
+                'profile_image' => $post->user->image_profile,
                 'category' => $post->category->category,
                 'post_content' => $post->post_content,
                 'image' => $image
@@ -186,6 +188,23 @@ class ProfilController extends Controller
 
 
         if ($request->new_password == NULL) {
+
+            if($request->file('profile_picture') != NULL){
+                // image request input
+                $img = $request->file('profile_picture');
+                // base path location
+                $path = base_path() . '/public/images/profile';
+                // naming image
+                $image_name = $id.'_'.time().'.'.$img->getClientOriginalExtension();
+                // imagepath url
+                $imagePath = url('/images/profile').'/'.$image_name;
+                // move image to storage
+                $img->move($path, $image_name);
+
+                //save to db
+                $user->image_profile =$imagePath;
+                $user->save();
+            }
             
             $user->name = $request->firstname;
             $user->name_second = $request->lastname;
@@ -231,9 +250,9 @@ class ProfilController extends Controller
             }
         }
 
-        //return redirect()->back();
         return redirect(route('profile.edit', $id))->with('success', 'IT WORKS!');
-;
+
+        //return $request->profile_picture;
     }
 
     /**
