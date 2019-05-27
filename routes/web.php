@@ -12,6 +12,7 @@
 */
 
 use App\Post;
+use App\Like;
 
 /*Route::get('/', function () {
     return view('page.index');
@@ -40,7 +41,8 @@ Route::get('/notif/{what}', 'PostController@showNotifications');
 Route::resource('profile', 'ProfilController');
 
 Route::get('/test', function(){
-	echo $imagePath = url('/images/profile');
+	$like = Like::where('post_id', 22)->where('user_id', Auth::user()->id)->first();
+    return $like;
 });
 //Route::get('/profile/{id}', 'ProfilController@profile')->name('profile');
 //Route::get('/profile/edit/{id}', 'ProfilController@editProfile')->name('edit-profile');

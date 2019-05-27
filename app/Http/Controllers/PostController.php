@@ -37,10 +37,13 @@ class PostController extends Controller
 
         $categories = Category::all();
         $posts = Post::orderBy('created_at', 'DESC')->get();
+        $user_id = Auth::user()->id;
 
         foreach ($posts as $post) {
 
             $image = $post->image;
+            $liked = $post->comment->where('user_id', $user_id)->where('post_id', $post->id)->first();
+            $liked = !empty($liked) ? 1 : 0;
 
             $data[] = [
                 'post_id' => $post->id,
@@ -51,11 +54,12 @@ class PostController extends Controller
                 'user_full_name' => $post->user->name.' '.$post->user->name_second,
                 'category' => $post->category->category,
                 'post_content' => $post->post_content,
-                'image' => $image
+                'image' => $image,
+                'liked' => $liked
             ];
         }
 
-
+        //return $data;
         
         return view('page.index')
             ->with('posts', $data)
@@ -151,16 +155,22 @@ class PostController extends Controller
     public function show($id)
     {
         $post = Post::find($id);
-
         $image = $post->image;
+        $comments = $post->comment->where('comment_type', 'comment');
 
-        $comments = $post->comment;
+        $user_id = Auth::user()->id;
+
+        $liked = $post->comment->where('user_id', $user_id)
+            ->where('post_id', $id)
+            ->first();
+        $liked = !empty($liked) ? 1 : 2;
 
         foreach ($comments as $comment) {
             $commentss[] = [
                 "comment_id" => $comment['id'],
                 "comment_post_id" => $comment['post_id'],
                 "comment_user_id" => $comment['user_id'],
+                "comment_user_picture" => $comment->user->image_profile,
                 "comment_user" => $comment->user['name']." ".$comment->user['name_second'],
                 "comment_content" => $comment['comment_content'],
                 "created_at" => $comment['created_at'],
@@ -176,8 +186,10 @@ class PostController extends Controller
                 'user' => $post->user->name." ".$post->user->name_second,
                 'category' => $post->category->category,
                 'post_content' => $post->post_content,
+                'profile_image' => $post->user->image_profile,
                 'comments' => $commentss,
-                'image' => $image
+                'image' => $image,
+                'liked' => $liked
             ];
 
             return view('page.post-detail')->with('post', $data);
@@ -190,8 +202,10 @@ class PostController extends Controller
                 'user' => $post->user->name,
                 'category' => $post->category->category,
                 'post_content' => $post->post_content,
+                'profile_image' => $post->user->image_profile,
                 'comments' => [],
-                'image' => $image
+                'image' => $image,
+                'liked' => $liked
             ];
 
             return view('page.post-detail')->with('post', $data);
@@ -314,11 +328,20 @@ class PostController extends Controller
     public function postComment(Request $request){
 
         if(Auth::user()->id == $request->user_id){
+
+            $validator = Validator::make($request->all(), [
+                'comment_content' => 'required'
+            ]);
+
+            if ($validator->fails()) {
+                return Redirect::back()->withErrors($validator);
+            }
             //retriving imag data
             $comment = array (
                 'post_id' => $request->post_id,
                 'user_id' => $request->user_id,
-                'comment_content' => $request->comment_content
+                'comment_content' => $request->comment_content,
+                'comment_type' => 'comment',
             );
 
             //post image
@@ -333,27 +356,14 @@ class PostController extends Controller
     public function notifications(){
 
         $user_id = Auth::user()->id;
-        //select * from post, comment WHERE comment.post_id=post.id AND post.user_id=1 AND comment.user_id != 1
 
         $comments = DB::table('comment')
             ->join('users', 'users.id', '=', 'comment.user_id')
             ->join('post', 'post.id', '=', 'comment.post_id')
             ->where('post.user_id', '=', $user_id)
             ->where('comment.user_id', '!=', $user_id)
-            ->select('comment.*', 'post.id', 'users.name', 'users.name_second')
+            ->select('comment.*', 'post.id', 'users.name', 'users.name_second', 'users.image_profile')
             ->get();
-
-            /*foreach ($comments as $comment) {
-                $com[] = [
-                    'id'=> $comment->id,
-                    'post_id'=> $comment->post_id,
-                    'user_id'=> $comment->user_id,
-                    'comment_content'=> $comment->comment_content,
-                    'comment_status'=> $comment->comment_status,
-                    'created_at'=> $comment->created_at,
-                    'updated_at'=> $comment->updated_at
-                ];
-            }*/
 
         //return $comments;
 
@@ -409,9 +419,10 @@ class PostController extends Controller
                     ->join('post', 'post.id', '=', 'comment.post_id')
                     ->where('post.user_id', '=', $user_id)
                     ->where('comment.user_id', '!=', $user_id)
-                    ->select('comment.*', 'post.id', 'users.name', 'users.name_second')
+                    ->select('comment.*', 'post.id', 'users.name', 'users.name_second', 'users.image_profile')
                     ->limit(5)
                     ->get();
+
                 return $notif;
                 break;
 
@@ -438,24 +449,56 @@ class PostController extends Controller
     }
 
     public function like(Request $request){
+
+        $user_id = Auth::user()->id;
+        $post_id = $request->post_id;
+        //$post_id = str_replace('post-', '', $request->post_id);
+
+        //$like = Like::where('post_id', $post_id)->where('user_id', $user_id)->first();
+
+        $like = Comment::where('post_id', $post_id)
+            ->where('comment_type', 'like')
+            ->where('user_id', $user_id)
+            ->first();
         
-        try {
-            $data = Like::create([
-                'post_id' => str_replace('post-', '', $request->post_id),
-                'user_id' => $request->user_id
-            ]);
+        if(!empty($like)){
+
+            $like->delete();
 
             return response()->json([
                 'status' => 200,
-                'data' => $data,
+                'data' => $like,
+                'liked' => 1,
                 'message' => 'success'
             ]);
-        } catch (Exception $e) {
-            return response()->json([
-                'status' => 500,
-                'data' => null,
-                'message' => $e->getMessage()
-            ]);
+
+        } else {
+
+            try {
+                $data = Comment::create([
+                    'post_id' => $post_id,
+                    'user_id' => Auth::user()->id,
+                    'comment_content' => 'like',
+                    'comment_status' => 0,
+                    'comment_type' => 'like'
+                ]);
+
+                return response()->json([
+                    'status' => 200,
+                    'data' => $data,
+                    'liked' => 0,
+                    'message' => 'success'
+                ]);
+
+            } catch (Exception $e) {
+                return response()->json([
+                    'status' => 500,
+                    'data' => null,
+                    'message' => 'failed'
+                ]);
+            }
+
+            return $like;
         }
     }
 

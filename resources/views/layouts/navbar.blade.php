@@ -81,12 +81,6 @@
                     <span>Settings</span>
                 </a>
 
-                <!-- item-->
-                <a href="javascript:void(0);" class="dropdown-item notify-item">
-                    <i class="fe-lock"></i>
-                    <span>Lock Screen</span>
-                </a>
-
                 <div class="dropdown-divider"></div>
 
                 <!-- item-->
@@ -97,11 +91,6 @@
                 </a>
 
             </div>
-        </li>
-        <li class="dropdown notification-list">
-            <a href="javascript:void(0);" class="nav-link right-bar-toggle waves-effect waves-light">
-                <i class="fe-settings noti-icon"></i>
-            </a>
         </li>
         @endguest
     </ul>
@@ -132,23 +121,3 @@
     </ul>
 </div>
 <!-- end Topbar -->
-
-@section('footer')
-<script type="text/javascript">
-    function clearNotif(){
-        $.ajax({
-            type: 'GET', //THIS NEEDS TO BE GET
-            url: 'http://127.0.0.1:8000/notif/cn',
-            success: function (data) {
-                console.log(data);
-                $(".noti-icon-badge").remove();
-                //$("#noticon").append('<span class="badge badge-danger rounded-circle noti-icon-badge">'+data+'</span>')
-                //$(".noti-icon-badge").html(data)   //// For replace with previous one
-            },
-            error: function() { 
-                console.log(data);
-            }
-        });
-    }
-</script>
-@endsection

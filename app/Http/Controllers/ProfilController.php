@@ -35,45 +35,7 @@ class ProfilController extends Controller
      */
     public function index()
     {
-        /*$user = User::find($id);
 
-        $data = [
-            'user_id' => $user->user_id,
-            'user_name' => $user->name,
-            'user_email' => $user->email,
-            'user_gender' => $user->profile->gender,
-            'user_birth' => $user->profile->date_birth,
-            'user_no' => $user->profile->no_hp,
-            'user_wa' => $user->profile->no_wa,
-            'user_about' => $user->profile->about,
-            'user_provinsi' => $user->profile->provinsi,
-            'user_kab_kota' => $user->profile->kab_kota,
-            'user_kec' => $user->profile->kecamatan,
-            'user_desa' => $user->profile->desa,
-            'user_join' => $user->created_at
-        ];
-
-        $user_post = $user->post;
-
-        foreach ($user_post as $post) {
-
-            $image = $user_post->image;
-
-            $data_post[] = [
-                'post_id' => $post->id,
-                'user_id' => $post->user_id,
-                'category_id' => $post->category_id,
-                'user' => $post->user->name,
-                'category' => $post->category->category,
-                'post_content' => $post->post_content,
-                'image' => $image
-            ];
-        }
-
-        //return $data;
-        return view('page.profile')
-            ->with('user', $data)
-            ->with('user_post', $data_post);*/
     }
 
     /**
@@ -126,12 +88,17 @@ class ProfilController extends Controller
         ];
 
         $user_post = Post::where('user_id', '=', $id)->orderBy('created_at', 'DESC')->get();
+        $data_post = [];
+        
+
 
         //$user_post = $user_post->image;
 
         foreach ($user_post as $post) {
 
             $image = $post->image;
+            $liked = $post->comment->where('user_id', $id)->where('post_id', $post->id)->first();
+            $liked = !empty($liked) ? 1 : 0;
 
             $data_post[] = [
                 'post_id' => $post->id,
@@ -139,9 +106,11 @@ class ProfilController extends Controller
                 'category_id' => $post->category_id,
                 'user' => $post->user->name,
                 'profile_image' => $post->user->image_profile,
+                'user_full_name' => $post->user->name.' '.$post->user->name_second,
                 'category' => $post->category->category,
                 'post_content' => $post->post_content,
-                'image' => $image
+                'image' => $image,
+                'liked' => $liked
             ];
         }
 

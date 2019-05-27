@@ -49,106 +49,6 @@
     </div>
     <!-- END wrapper -->
 
-    <!-- Right Sidebar -->
-    <div class="right-bar">
-        <div class="rightbar-title">
-            <a href="javascript:void(0);" class="right-bar-toggle float-right">
-                <i class="dripicons-cross noti-icon"></i>
-            </a>
-            <h5 class="m-0 text-white">Settings</h5>
-        </div>
-        <div class="slimscroll-menu">
-            <!-- User box -->
-            <div class="user-box">
-                <div class="user-img">
-                    <img src="{{ asset('images/users/user-1.jpg') }}" alt="user-img" title="Mat Helme" class="rounded-circle img-fluid">
-                    <a href="javascript:void(0);" class="user-edit"><i class="mdi mdi-pencil"></i></a>
-                </div>
-
-                <h5><a href="javascript: void(0);">Geneva Kennedy</a> </h5>
-                <p class="text-muted mb-0"><small>Admin Head</small></p>
-            </div>
-
-            <!-- Settings -->
-            <hr class="mt-0" />
-            <h5 class="pl-3">Basic Settings</h5>
-            <hr class="mb-0" />
-
-            <div class="p-3">
-                <div class="checkbox checkbox-primary mb-2">
-                    <input id="Rcheckbox1" type="checkbox" checked>
-                    <label for="Rcheckbox1">
-                        Notifications
-                    </label>
-                </div>
-                <div class="checkbox checkbox-primary mb-2">
-                    <input id="Rcheckbox2" type="checkbox" checked>
-                    <label for="Rcheckbox2">
-                        API Access
-                    </label>
-                </div>
-                <div class="checkbox checkbox-primary mb-2">
-                    <input id="Rcheckbox3" type="checkbox">
-                    <label for="Rcheckbox3">
-                        Auto Updates
-                    </label>
-                </div>
-                <div class="checkbox checkbox-primary mb-2">
-                    <input id="Rcheckbox4" type="checkbox" checked>
-                    <label for="Rcheckbox4">
-                        Online Status
-                    </label>
-                </div>
-                <div class="checkbox checkbox-primary mb-0">
-                    <input id="Rcheckbox5" type="checkbox" checked>
-                    <label for="Rcheckbox5">
-                        Auto Payout
-                    </label>
-                </div>
-            </div>
-
-            <!-- Timeline -->
-            <hr class="mt-0" />
-            <h5 class="pl-3 pr-3">Messages <span class="float-right badge badge-pill badge-danger">25</span></h5>
-            <hr class="mb-0" />
-            <div class="p-3">
-                <div class="inbox-widget">
-                    <div class="inbox-item">
-                        <div class="inbox-item-img"><img src="{{ asset('images/users/user-2.jpg') }}" class="rounded-circle" alt=""></div>
-                        <p class="inbox-item-author"><a href="javascript: void(0);" class="text-dark">Tomaslau</a></p>
-                        <p class="inbox-item-text">I've finished it! See you so...</p>
-                    </div>
-                    <div class="inbox-item">
-                        <div class="inbox-item-img"><img src="{{ asset('images/users/user-3.jpg') }}" class="rounded-circle" alt=""></div>
-                        <p class="inbox-item-author"><a href="javascript: void(0);" class="text-dark">Stillnotdavid</a></p>
-                        <p class="inbox-item-text">This theme is awesome!</p>
-                    </div>
-                    <div class="inbox-item">
-                        <div class="inbox-item-img"><img src="{{ asset('images/users/user-4.jpg') }}" class="rounded-circle" alt=""></div>
-                        <p class="inbox-item-author"><a href="javascript: void(0);" class="text-dark">Kurafire</a></p>
-                        <p class="inbox-item-text">Nice to meet you</p>
-                    </div>
-
-                    <div class="inbox-item">
-                        <div class="inbox-item-img"><img src="{{ asset('images/users/user-5.jpg') }}" class="rounded-circle" alt=""></div>
-                        <p class="inbox-item-author"><a href="javascript: void(0);" class="text-dark">Shahedk</a></p>
-                        <p class="inbox-item-text">Hey! there I'm available...</p>
-                    </div>
-                    <div class="inbox-item">
-                        <div class="inbox-item-img"><img src="{{ asset('images/users/user-6.jpg') }}" class="rounded-circle" alt=""></div>
-                        <p class="inbox-item-author"><a href="javascript: void(0);" class="text-dark">Adhamdannaway</a></p>
-                        <p class="inbox-item-text">This theme is awesome!</p>
-                    </div>
-                </div>
-                <!-- end inbox-widget -->
-            </div>
-            <!-- end .p-3-->
-
-        </div>
-        <!-- end slimscroll-menu-->
-    </div>
-    <!-- /Right-bar -->
-
     <!-- Right bar overlay-->
     <div class="rightbar-overlay"></div>
 
@@ -203,19 +103,20 @@
         });
 
     </script>
+
     <script type="text/javascript">
         $('.noti-icon').on('click', function() {
             $.ajax({
                 type: 'GET', //THIS NEEDS TO BE GET
                 url: 'http://127.0.0.1:8000/notif/nl',
                 success: function (data) {
+                    $('.noti-scroll').empty();
                     //var obj = JSON.parse(data);
-                    //console.log(data);
+                    console.log(data);
                     $.each(data, function (key, val) {
-                        $(".noti-scroll").append('<a href="{{ url("post") }}/'+val.post_id+'" class="dropdown-item notify-item active"> <div class="notify-icon"> <img src="{{asset("images/users/user-1.jpg")}}" class="img-fluid rounded-circle" alt=""/> </div><p class="notify-details">'+val.name+' '+val.name_second+'</p><p class="text-muted mb-0 user-msg"> <small>'+val.comment_content+'</small> </p></a>');
+                        $(".noti-scroll").append('<a href="{{ url("post") }}/'+val.post_id+'" class="dropdown-item notify-item active"> <div class="notify-icon"> <img src="'+val.image_profile+'" class="img-fluid rounded-circle" alt=""/> </div><p class="notify-details">'+val.name+'</p><p class="text-muted mb-0 user-msg"> <small>'+val.comment_content+'</small> </p></a>');
                        //console.log(val.comment_content);
                     });
-                    //console.log(data);
                     //$(".noti-icon-badge").html(data)   //// For replace with previous one
                 },
                 error: function() { 
@@ -224,6 +125,24 @@
             });
         });
     </script>
+
+<script>
+    function clearNotif(){
+        $.ajax({
+            type: 'GET', //THIS NEEDS TO BE GET
+            url: 'http://127.0.0.1:8000/notif/cn',
+            success: function (data) {
+                console.log(data);
+                $(".noti-icon-badge").remove();
+                //$("#noticon").append('<span class="badge badge-danger rounded-circle noti-icon-badge">'+data+'</span>')
+                //$(".noti-icon-badge").html(data)   //// For replace with previous one
+            },
+            error: function() { 
+                console.log(data);
+            }
+        });
+    }
+</script>
 
     @yield('footer')
 
