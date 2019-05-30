@@ -105,7 +105,7 @@
     </script>
 
     <script type="text/javascript">
-        $('.noti-icon').on('click', function() {
+        function getNotif(){
             $.ajax({
                 type: 'GET', //THIS NEEDS TO BE GET
                 url: 'http://127.0.0.1:8000/notif/nl',
@@ -114,7 +114,7 @@
                     //var obj = JSON.parse(data);
                     console.log(data);
                     $.each(data, function (key, val) {
-                        $(".noti-scroll").append('<a href="{{ url("post") }}/'+val.post_id+'" class="dropdown-item notify-item active"> <div class="notify-icon"> <img src="'+val.image_profile+'" class="img-fluid rounded-circle" alt=""/> </div><p class="notify-details">'+val.name+'</p><p class="text-muted mb-0 user-msg"> <small>'+val.comment_content+'</small> </p></a>');
+                        $(".noti-scroll").append('<a href="{{ url("post") }}/'+val.post_id+'" class="dropdown-item notify-item active"> <div class="notify-icon"> <img src="'+val.image_profile+'" class="img-fluid rounded-circle" alt=""/> </div><p class="notify-details">'+val.name+'</p><p class="text-muted mb-0 user-msg"> <small>'+val.comment_content+' postingan anda</small> '+val.created_at+'</p></a>');
                        //console.log(val.comment_content);
                     });
                     //$(".noti-icon-badge").html(data)   //// For replace with previous one
@@ -123,7 +123,7 @@
                     console.log(data);
                 }
             });
-        });
+        }
     </script>
 
 <script>

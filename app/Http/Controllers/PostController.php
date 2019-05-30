@@ -27,6 +27,72 @@ class PostController extends Controller
         $this->middleware('auth');
     }
 
+    public function timeAgo ( $time_ago ) {
+        $time_ago       = strtotime($time_ago);
+        $cur_time       = time();
+        $time_elapsed   = $cur_time - $time_ago;
+        $seconds        = $time_elapsed ;
+        $minutes        = round($time_elapsed / 60 );
+        $hours          = round($time_elapsed / 3600);
+        $days           = round($time_elapsed / 86400 );
+        $weeks          = round($time_elapsed / 604800);
+        $months         = round($time_elapsed / 2600640 );
+        $years          = round($time_elapsed / 31207680 );
+        // Seconds
+        if($seconds <= 60){
+            return "just now";
+        }
+        //Minutes
+        else if($minutes <=60){
+            if($minutes==1){
+                return "one minute ago";
+            }
+            else{
+                return "$minutes minutes ago";
+            }
+        }
+        //Hours
+        else if($hours <=24){
+            if($hours==1){
+                return "an hour ago";
+            }else{
+                return "$hours hrs ago";
+            }
+        }
+        //Days
+        else if($days <= 7){
+            if($days==1){
+                return "yesterday";
+            }else{
+                return "$days days ago";
+            }
+        }
+        //Weeks
+        else if($weeks <= 4.3){
+            if($weeks==1){
+                return "a week ago";
+            }else{
+                return "$weeks weeks ago";
+            }
+        }
+        //Months
+        else if($months <=12){
+            if($months==1){
+                return "a month ago";
+            }else{
+                return "$months months ago";
+            }
+        }
+        //Years
+        else{
+            if($years==1){
+                return "one year ago";
+            }else{
+                return "$years years ago";
+            }
+        }
+    }
+
     /**
      * Show the application dashboard.
      *
@@ -54,6 +120,7 @@ class PostController extends Controller
                 'user_full_name' => $post->user->name.' '.$post->user->name_second,
                 'category' => $post->category->category,
                 'post_content' => $post->post_content,
+                'time' => $this->timeAgo($post->created_at),
                 'image' => $image,
                 'liked' => $liked
             ];
@@ -353,11 +420,11 @@ class PostController extends Controller
     }
 
     //notif
-    public function notifications(){
+    public function notifications ( $notif ){
 
         $user_id = Auth::user()->id;
 
-        $comments = DB::table('comment')
+        $notifications = DB::table('comment')
             ->join('users', 'users.id', '=', 'comment.user_id')
             ->join('post', 'post.id', '=', 'comment.post_id')
             ->where('post.user_id', '=', $user_id)
@@ -365,10 +432,68 @@ class PostController extends Controller
             ->select('comment.*', 'post.id', 'users.name', 'users.name_second', 'users.image_profile')
             ->get();
 
-        //return $comments;
+        $data = [];
 
-        return view('page.notifications')
-            ->with('comments', $comments);
+        foreach ($notifications as $notification) {
+
+            $data[] = [
+                'id'=> $notification->id,
+                'post_id'=> $notification->post_id,
+                'user_id'=> $notification->user_id,
+                'comment_content'=> $notification->comment_content,
+                'comment_status'=> $notification->comment_status,
+                'comment_type'=> $notification->comment_type,
+                'name'=> $notification->name,
+                'name_second'=> $notification->name_second,
+                'image_profile'=> $notification->image_profile,
+                'created_at'=> $this->timeAgo($notification->created_at),
+                'updated_at'=> $notification->updated_at
+            ];
+        }
+
+        switch ($notif) {
+            case 'all':
+
+                return view('page.notifications')
+                    ->with('notifications', $data);
+                break;
+
+            case 'notification-count':
+
+                $notif_count = $notifications
+                    ->where('comment.comment_status', '=', 0);
+
+                return count($notif_count);
+                break;
+            case 'notification-list':            
+
+
+
+                return $notif;
+                break;
+
+            case 'notification-list':  
+                
+                $update_status = array(
+                    'comment_status' => 1
+                );
+                
+                $notif = DB::table('comment')
+                    ->join('users', 'users.id', '=', 'comment.user_id')
+                    ->join('post', 'post.id', '=', 'comment.post_id')
+                    ->where('post.user_id', '=', $user_id)
+                    ->where('comment.user_id', '!=', $user_id)
+                    ->where('comment.comment_status', '=', 0)
+                    ->select('comment.*', 'post.id', 'users.name', 'users.name_second')
+                    ->update($update_status);
+            
+                break;
+
+        }
+
+        /*return view('page.notifications')
+            ->with('notifications', $data);*/
+
     }
 
     public function showNotifications($what){
@@ -385,17 +510,7 @@ class PostController extends Controller
             ->select('comment.*', 'post.id', 'users.name', 'users.name_second')
             ->get();
 
-            /*foreach ($comments as $comment) {
-                $com[] = [
-                    'id'=> $comment->id,
-                    'post_id'=> $comment->post_id,
-                    'user_id'=> $comment->user_id,
-                    'comment_content'=> $comment->comment_content,
-                    'comment_status'=> $comment->comment_status,
-                    'created_at'=> $comment->created_at,
-                    'updated_at'=> $comment->updated_at
-                ];
-            }*/
+
 
         switch ($what) {
             case 'nc':

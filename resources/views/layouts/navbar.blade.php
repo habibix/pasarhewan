@@ -24,7 +24,7 @@
         </li>
 
         <li class="dropdown notification-list notif-icon">
-            <a id="noticon" class="nav-link dropdown-toggle waves-effect waves-light" data-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
+            <a href="javascript: void(0);" onclick="getNotif()" id="noticon" class="nav-link dropdown-toggle waves-effect waves-light" data-toggle="dropdown" role="button" aria-haspopup="false" aria-expanded="false">
                 <i class="fe-bell noti-icon"></i>
                 
             </a>

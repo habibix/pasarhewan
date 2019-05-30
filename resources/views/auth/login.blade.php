@@ -37,15 +37,22 @@
                                                     <label class="custom-control-label" for="checkmeout0">Remember Me</label>
                                                 </div>
                                             </div>
+                                            
                                             <button type="submit" class="btn btn-primary waves-effect waves-light">Submit</button>
+
                                             <div class="form-group mt-2">
                                                 <a href="{{ route('password.request') }}">Forgot Your Password? </a>
                                             </div>
                                             
                                         </form>
 
+
+
                                     </div> <!-- end card-body-->
                                 </div> <!-- end card-->
+
+                                <a href="{{ url('/register') }}" class="btn btn-primary waves-effect waves-light col-lg-12">Register</a>
+
                             </div>
                             <!-- END -->
                     

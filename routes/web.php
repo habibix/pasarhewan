@@ -20,30 +20,36 @@ use App\Like;
 
 Auth::routes();
 
-// POST ROUTE
-Route::resource('post', 'PostController');
-Route::get('/post/{id}', 'PostController@postDetail')->name('post-detail');
-Route::get('/', 'PostController@index')->name('home');
+Route::group(['middleware' => 'auth'], function () {
 
-Route::post('/post/like', 'PostController@like')->name('post-like');
+	// POST ROUTE
+	Route::resource('post', 'PostController');
+	Route::get('/post/{id}', 'PostController@postDetail')->name('post-detail');
+	Route::get('/', 'PostController@index')->name('home');
 
-Route::get('/c', 'PostController@category')->name('category');
-Route::get('/c/{cat}', 'PostController@categoryFilter');
+	Route::post('/post/like', 'PostController@like')->name('post-like');
 
-// Comment
-Route::post('/comment', 'PostController@postComment');
+	Route::get('/c', 'PostController@category')->name('category');
+	Route::get('/c/{cat}', 'PostController@categoryFilter');
 
-// Notif
-Route::get('/notifications', 'PostController@notifications');
-Route::get('/notif/{what}', 'PostController@showNotifications');
+	// Comment
+	Route::post('/comment', 'PostController@postComment');
 
-// PROFILE ROUTE
-Route::resource('profile', 'ProfilController');
+	// Notif
+	Route::get('/notifications', 'NotificationController@index');
+	Route::get('/notifications/{notif}', 'NotificationController@notifications');
+	//Route::get('/notif/{what}', 'PostController@showNotifications');
 
-Route::get('/test', function(){
-	$like = Like::where('post_id', 22)->where('user_id', Auth::user()->id)->first();
-    return $like;
+	// PROFILE ROUTE
+	Route::resource('profile', 'ProfilController');
+
 });
+
+
+/*Route::get('/test', function(){
+	$like = Like::where('post_id', 22)->where('user_id', 3)->first();
+    return $like;
+});*/
 //Route::get('/profile/{id}', 'ProfilController@profile')->name('profile');
 //Route::get('/profile/edit/{id}', 'ProfilController@editProfile')->name('edit-profile');
 

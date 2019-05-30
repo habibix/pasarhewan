@@ -86,7 +86,7 @@
 
                         <div class="media-body">
                             <h5 class="m-0"><a href="{{ url('profile') }}/{{ $post['user_id'] }}">{{ $post['user_full_name'] }}</a></h5>
-                            <p class="text-muted"><small><a href="{{ url('post') }}/{{ $post['post_id'] }}">about 2 minuts ago</a></small></p>
+                            <p class="text-muted"><small><a href="{{ url('post') }}/{{ $post['post_id'] }}">{{ $post['time'] }}</a></small></p>
                         </div>
                         <p class="text-muted"><small>{{ $post['category'] }}</small></p>
                     </div>
