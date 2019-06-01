@@ -89,10 +89,10 @@
         
         $.ajax({
             type: 'GET', //THIS NEEDS TO BE GET
-            url: 'http://127.0.0.1:8000/notif/nc',
+            url: '{{ url("/notifications/notification-count") }}',
             success: function (data) {
                 var obj = JSON.parse(data);
-                console.log(data);
+                console.log(" jumlah notif "+data);
                 if(data > 0)
                     $("#noticon").append('<span class="badge badge-danger rounded-circle noti-icon-badge">'+data+'</span>')
                 //$(".noti-icon-badge").html(data)   //// For replace with previous one
@@ -108,13 +108,22 @@
         function getNotif(){
             $.ajax({
                 type: 'GET', //THIS NEEDS TO BE GET
-                url: 'http://127.0.0.1:8000/notif/nl',
+                url: '{{ url("/notifications/notification-list") }}',
                 success: function (data) {
                     $('.noti-scroll').empty();
                     //var obj = JSON.parse(data);
                     console.log(data);
                     $.each(data, function (key, val) {
-                        $(".noti-scroll").append('<a href="{{ url("post") }}/'+val.post_id+'" class="dropdown-item notify-item active"> <div class="notify-icon"> <img src="'+val.image_profile+'" class="img-fluid rounded-circle" alt=""/> </div><p class="notify-details">'+val.name+'</p><p class="text-muted mb-0 user-msg"> <small>'+val.comment_content+' postingan anda</small> '+val.created_at+'</p></a>');
+
+                        if(val.comment_type == 'like'){
+                            var comment_type = 'menyikai'
+                        } else {
+                            var comment_type = 'mengomentari'
+                        }
+
+                        console.log(comment_type);
+
+                        $(".noti-scroll").append('<a href="{{ url("post") }}/'+val.post_id+'" class="dropdown-item notify-item active"> <div class="notify-icon"> <img src="'+val.image_profile+'" class="img-fluid rounded-circle" alt=""/> </div><p class="notify-details">'+val.name+'</p><p class="text-muted mb-0 user-msg"> <small>'+comment_type+' postingan anda</small> '+val.created_at+'</p></a>');
                        //console.log(val.comment_content);
                     });
                     //$(".noti-icon-badge").html(data)   //// For replace with previous one
@@ -130,7 +139,7 @@
     function clearNotif(){
         $.ajax({
             type: 'GET', //THIS NEEDS TO BE GET
-            url: 'http://127.0.0.1:8000/notif/cn',
+            url: '{{ url("/notifications/notification-clear") }}',
             success: function (data) {
                 console.log(data);
                 $(".noti-icon-badge").remove();

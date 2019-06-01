@@ -105,7 +105,7 @@ class NotificationController extends Controller {
                 'id'=> $notification->id,
                 'post_id'=> $notification->post_id,
                 'user_id'=> $notification->user_id,
-                'comment_content'=> $notification->comment_content,
+                //'comment_content'=> $notification->comment_content,
                 'comment_status'=> $notification->comment_status,
                 'comment_type'=> $notification->comment_type,
                 'name'=> $notification->name,
@@ -116,72 +116,72 @@ class NotificationController extends Controller {
             ];
         }
 
+        $notif_id = array_count_values(array_column($data, 'post_id'));
+
         //dd($data);
 
         //return $notifications;
 
-        //return array_count_values(array_column($data, 'post_id'));
+        //print_r($notif_id);
 
         return view('page.notifications')
-                ->with('notifications', $data);
+                ->with('notifications', $data)
+                ->with('notif_id', $notif_id);
     }
     
     public function notifications ( $notif ){
 
         $user_id = Auth::user()->id;
 
-        $notifications = DB::table('comment')
-        	->select('comment.*', 'post.id', 'users.name', 'users.name_second', 'users.image_profile')
-            ->join('users', 'users.id', '=', 'comment.user_id')
-            ->join('post', 'post.id', '=', 'comment.post_id')
-            ->where('post.user_id', '=', $user_id)
-            ->where('comment.user_id', '!=', $user_id)
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        $data = [];
-
-        foreach ($notifications as $notification) {
-
-            $data[] = [
-                'id'=> $notification->id,
-                'post_id'=> $notification->post_id,
-                'user_id'=> $notification->user_id,
-                'comment_content'=> $notification->comment_content,
-                'comment_status'=> $notification->comment_status,
-                'comment_type'=> $notification->comment_type,
-                'name'=> $notification->name,
-                'name_second'=> $notification->name_second,
-                'image_profile'=> $notification->image_profile,
-                'created_at'=> $this->timeAgo($notification->created_at),
-                'updated_at'=> $notification->updated_at
-            ];
-        }
-
         switch ($notif) {
 
             case 'notification-count':
 
-                $notif_count = $notifications
-                    ->where('comment.comment_status', '=', 0);
+	            $notifications = DB::table('comment')
+		        	->select('comment.*', 'post.id', 'users.name', 'users.name_second', 'users.image_profile')
+		            ->join('users', 'users.id', '=', 'comment.user_id')
+		            ->join('post', 'post.id', '=', 'comment.post_id')
+		            ->where('post.user_id', '=', $user_id)
+		            ->where('comment.user_id', '!=', $user_id)
+		            ->where('comment.comment_status', '=', 0)
+		            ->orderBy('created_at', 'desc')
+		            ->get();
 
-                return count($notif_count);
+                return count($notifications);
                 break;
+
             case 'notification-list':            
 
-            	//$notif_list = $notifications->where('comment.comment_status', '=', 0);
-
-            	$notif_list = DB::table('comment')
+            	$notifications = DB::table('comment')
+		        	->select('comment.*', 'post.id', 'users.name', 'users.name_second', 'users.image_profile')
 		            ->join('users', 'users.id', '=', 'comment.user_id')
 		            ->join('post', 'post.id', '=', 'comment.post_id')
 		            ->where('post.user_id', '=', $user_id)
 		            ->where('comment.user_id', '!=', $user_id)
 		            ->orderBy('created_at', 'desc')
-		            ->select('comment.*', 'post.id', 'users.name', 'users.name_second', 'users.image_profile')
 		            ->limit(5)
 		            ->get();
 
-                return $notif_list;
+		        $data = [];
+
+		        foreach ($notifications as $notification) {
+
+		            $data[] = [
+		                'id'=> $notification->id,
+		                'post_id'=> $notification->post_id,
+		                'user_id'=> $notification->user_id,
+		                'comment_content'=> $notification->comment_content,
+		                'comment_status'=> $notification->comment_status,
+		                'comment_type'=> $notification->comment_type,
+		                'name'=> $notification->name,
+		                'name_second'=> $notification->name_second,
+		                'image_profile'=> $notification->image_profile,
+		                'created_at'=> $this->timeAgo($notification->created_at),
+		                'updated_at'=> $notification->updated_at
+		            ];
+		        }
+
+                return $data;
                 break;
 
             case 'notification-clear':  
@@ -202,9 +202,6 @@ class NotificationController extends Controller {
                 break;
 
         }
-
-        /*return view('page.notifications')
-            ->with('notifications', $data);*/
 
     }
 }

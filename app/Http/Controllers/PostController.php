@@ -98,12 +98,20 @@ class PostController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
+    public function index(Request $request) {
+
+        //$posts = Post::paginate(5);
 
         $categories = Category::all();
-        $posts = Post::orderBy('created_at', 'DESC')->get();
+        $posts = Post::orderBy('created_at', 'DESC')->paginate(10);
         $user_id = Auth::user()->id;
+
+        $paginate = [
+            'last_page'=> $posts->lastPage(),
+            'total'=> $posts->total()
+        ];
+
+        $data = [];
 
         foreach ($posts as $post) {
 
@@ -126,12 +134,20 @@ class PostController extends Controller
             ];
         }
 
+        if ($request->ajax()) {
+            $view = view('page.fetch-data', compact('data'))->render();
+            //$view = view('page.fetch-data')->with('posts', $data)->render();
+            return response()->json(['html' => $view]);
+        }
+
         //return $data;
         
-        return view('page.index')
-            ->with('posts', $data)
-            ->with('categories', $categories);
+        return view('page.index')->with('paginate', $paginate)->with('posts', $data)->with('categories', $categories);
     }
+
+    /*public function fetch_data(Request $request){
+        
+    }*/
 
     /**
      * Show the form for creating a new resource.
@@ -308,9 +324,23 @@ class PostController extends Controller
      * @param  \App\post  $post
      * @return \Illuminate\Http\Response
      */
-    public function destroy(post $post)
+    public function destroy(Request $request)
     {
-        //
+        $post = Post::findOrFail($request->post_id);
+
+        if($post->user_id == Auth::user()->id){
+            $post = $post->delete();
+            if($post) {
+                return response()->json([
+                    'status' => 200,
+                    'data' => $post,
+                    'message' => 'success'
+                ]);
+            }
+        }
+        
+        /*if(!User::destroy($id)) return redirect()->back();
+        return redirect()->route('page.index');*/
     }
 
     

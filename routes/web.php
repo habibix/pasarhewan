@@ -27,6 +27,9 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::get('/post/{id}', 'PostController@postDetail')->name('post-detail');
 	Route::get('/', 'PostController@index')->name('home');
 
+	// delete post
+	Route::post('/post/delete', 'PostController@destroy');
+
 	Route::post('/post/like', 'PostController@like')->name('post-like');
 
 	Route::get('/c', 'PostController@category')->name('category');

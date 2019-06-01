@@ -1,5 +1,13 @@
+@section('header')
+
+@endsection
+
 @extends('layouts.app') @section('content')
 <div class="container">
+    <div class="ajax-load text-center" style="display:none">
+    <p><img src="http://demo.itsolutionstuff.com/plugin/loader.gif">Loading More post</p>
+</div>
+
     <div class="d-flex justify-content-center">
         <div class="col-lg-6 col-lx-6">
 
@@ -73,11 +81,15 @@
             </div>
 
             @if(!empty($posts))
+
             <!-- TIMELINE START -->
+
+            <div id="timeline">
 
             @foreach ($posts as $post)
             <div class="card" id="post-{{ $post['post_id'] }}">
                 <div class="card-body">
+
                     <div class="media">
 
                         @if($post['profile_image'] != NULL)
@@ -88,7 +100,20 @@
                             <h5 class="m-0"><a href="{{ url('profile') }}/{{ $post['user_id'] }}">{{ $post['user_full_name'] }}</a></h5>
                             <p class="text-muted"><small><a href="{{ url('post') }}/{{ $post['post_id'] }}">{{ $post['time'] }}</a></small></p>
                         </div>
-                        <p class="text-muted"><small>{{ $post['category'] }}</small></p>
+                        
+                        @if(Auth::user()->id == $post['user_id'])
+                        <div class="dropdown">
+
+                            <a class="dropdown-toggle dropdown-toggle" href="https://example.com" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="mdi mdi-dots-horizontal mdi-24px"></i>
+                            </a>
+
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" x-placement="bottom-start" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 35px, 0px);">
+                                <a class="dropdown-item" href="#" >Edit</a>
+                                <a id="{{ $post['post_id'] }}" class="dropdown-item" href="javascript: void(0);" onclick="deletePost()">Delete</a>
+                            </div>
+                        </div>
+                        @endif
                     </div>
                 </div>
 
@@ -155,7 +180,13 @@
             </div>
             @endforeach
 
+            </div>
+
             <!-- TIMELINE END -->
+
+            <div class="text-center load-more">
+                <a href="javascript:void(0);" class="text-danger"><i class="mdi mdi-spin mdi-loading mr-1"></i> Load more </a>
+            </div>
 
             @else Belum ada postingan @endif
 
@@ -215,5 +246,73 @@ $("input[id*=comment-]").keyup(function () {
     }
 });
  
+</script>
+
+<script type="text/javascript">
+    var page = 1;
+    $(window).scroll(function() {
+        if($(window).scrollTop() + $(window).height() >= $(document).height()) {
+            if (page > {{ $paginate['last_page'] }} ) {
+                $('.load-more').html("Tidak ada postingan");
+               return false;
+            } else {
+                loadMoreData(page);
+            }
+            page++;
+        }
+    });
+
+    function loadMoreData(page){
+      $.ajax(
+            {
+                url: '?page=' + page,
+                type: "get",
+                beforeSend: function()
+                {
+                    $('.load-more').show();
+                }
+            })
+            .done(function(data)
+            {
+                console.log(data)
+                
+                $("#timeline").append(data.html);
+            })
+            .fail(function(jqXHR, ajaxOptions, thrownError)
+            {
+                  console.log("server error response");
+            });
+    }
+</script>
+
+<script type="text/javascript">
+    function deletePost(){
+
+        var post_id = $(event.target).attr('id');
+
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
+        $.ajax({
+            url: "{{ url('post/delete') }}",
+            type: 'POST',
+            data: {
+                post_id: post_id,
+            },
+
+            success: function(data) {
+                if(data.data == true){
+                    $('#post-'+post_id).remove();
+                }
+            },
+
+            error: function(data) {
+                console.log("error " + data);
+            }
+        });
+    }
 </script>
 @endsection
