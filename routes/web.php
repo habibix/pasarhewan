@@ -24,7 +24,7 @@ Route::group(['middleware' => 'auth'], function () {
 
 	// POST ROUTE
 	Route::resource('post', 'PostController');
-	Route::get('/post/{id}', 'PostController@postDetail')->name('post-detail');
+	//Route::get('/post/{id}', 'PostController@postDetail')->name('post-detail');
 	Route::get('/', 'PostController@index')->name('home');
 
 	// delete post

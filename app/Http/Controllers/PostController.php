@@ -142,7 +142,75 @@ class PostController extends Controller
 
         //return $data;
         
-        return view('page.index')->with('paginate', $paginate)->with('posts', $data)->with('categories', $categories);
+        return view('page.index')
+            ->with('paginate', $paginate)
+            ->with('posts', $data)->with('categories', $categories);
+    }
+
+    public function category(){
+        $categories = Category::all();
+        
+        return view('page.category')
+            ->with('categories', $categories);
+    }
+
+    public function categoryFilter($cat){
+
+        $categories = Category::all();
+        $cat = strtolower($cat);
+        $cat_id = Category::where('category', $cat)->first();
+        $posts = Post::where('category_id', $cat_id->id)->orderBy('created_at', 'DESC')->paginate(10);
+        $user_id = Auth::user()->id;
+
+        $paginate = [
+            'last_page'=> $posts->lastPage(),
+            'total'=> $posts->total()
+        ];
+
+        $data = [];
+        
+
+        if(count($posts) > 0){
+            foreach ($posts as $post) {
+
+                $liked = $post->comment->where('user_id', $user_id)->where('post_id', $post->id)->first();
+                $liked = !empty($liked) ? 1 : 0;
+                $image = $post->image;
+
+                $data[] = [
+                    'post_id' => $post->id,
+                    'user_id' => $post->user_id,
+                    'category_id' => $post->category_id,
+                    'user' => $post->user->name,
+                    'profile_image' => $post->user->image_profile,
+                    'user_full_name' => $post->user->name.' '.$post->user->name_second,
+                    'category' => $post->category->category,
+                    'post_content' => $post->post_content,
+                    'time' => $this->timeAgo($post->created_at),
+                    'image' => $image,
+                    'liked' => $liked
+                ];
+            
+            }
+
+            //return $data;
+            
+            return view('page.index')
+                ->with('posts', $data)
+                ->with('title', "Kategori ".ucfirst($cat))
+                ->with('paginate', $paginate)
+                ->with('categories', $categories);
+
+        } else {
+
+            return view('page.index')
+            ->with('categories', $categories);
+        }
+
+        if ($request->ajax()) {
+            $view = view('page.fetch-data', compact('data'))->render();
+            return response()->json(['html' => $view]);
+        }
     }
 
     /*public function fetch_data(Request $request){
@@ -165,8 +233,7 @@ class PostController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
-    {
+    public function store(Request $request) {
 
         $validator = Validator::make($request->all(), [
             'post_category' => 'required',
@@ -275,7 +342,9 @@ class PostController extends Controller
                 'liked' => $liked
             ];
 
-            return view('page.post-detail')->with('post', $data);
+            return view('page.post-detail')
+                ->with('title', $post->user->name." ".$post->user->name_second)
+                ->with('post', $data);
 
         } else {
             $data = [
@@ -291,7 +360,9 @@ class PostController extends Controller
                 'liked' => $liked
             ];
 
-            return view('page.post-detail')->with('post', $data);
+            return view('page.post-detail')
+                ->with('title', $post->user->name)
+                ->with('post', $data);
         }
     }
 
@@ -350,7 +421,7 @@ class PostController extends Controller
      * @param post_id
      */
 
-    public function profile($id){
+    /*public function profile($id){
 
         $user = User::find($id);
 
@@ -373,54 +444,9 @@ class PostController extends Controller
         //return $data;
         return view('page.profile')
             ->with('user', $data);
-    }
+    }*/
 
-    public function category(){
-        $categories = Category::all();
-        
-        return view('page.category')
-            ->with('categories', $categories);
-    }
-
-    public function categoryFilter($cat){
-
-        $categories = Category::all();
-        $cat = strtolower($cat);
-        $cat_id = Category::where('category', $cat)->first();
-        $posts = Post::where('category_id', $cat_id->id)->orderBy('created_at', 'DESC')->get();
-        
-
-        if(count($posts) > 0){
-            foreach ($posts as $post) {
-
-                $image = $post->image;
-
-                $data[] = [
-                    'post_id' => $post->id,
-                    'user_id' => $post->user_id,
-                    'category_id' => $post->category_id,
-                    'user' => $post->user->name,
-                    'profile_image' => $post->user->image_profile,
-                    'user_full_name' => $post->user->name.' '.$post->user->name_second,
-                    'category' => $post->category->category,
-                    'post_content' => $post->post_content,
-                    'image' => $image
-                ];
-            
-            }
-
-            //return $data;
-            
-            return view('page.index')
-                ->with('posts', $data)
-                ->with('categories', $categories);
-
-        } else {
-
-            return view('page.index')
-            ->with('categories', $categories);
-        }
-    }
+    
 
     public function postComment(Request $request){
 

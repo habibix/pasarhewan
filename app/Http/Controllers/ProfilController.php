@@ -116,6 +116,7 @@ class ProfilController extends Controller
 
         //return $user_post;
         return view('page.profile')
+            ->with('title', $user->name." ".$user->name_second)
             ->with('user', $data)
             ->with('user_post', $data_post);
     }

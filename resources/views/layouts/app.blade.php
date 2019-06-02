@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Anishop - Situs Jual Beli Hewan Piara Online</title>
+    <title>
+        {{ isset($title) ? $title : 'Situs Jual Beli Binatang Peliharaan Online' }} - Pasarhewan.org</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="Situs Jual Beli Binatang Hewan Peliharaan Online" name="description" />
     <meta content="Anishop" name="author" />
