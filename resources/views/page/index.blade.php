@@ -42,7 +42,7 @@
                             <select name="post_category" class="form-control">
                                 <option>-- Kategori --</option>
                                 @foreach ($categories as $category)
-                                <option value="{{ $category->id }}">{{ $category->category }}</option>
+                                <option value="{{ $category->id }}">{{ ucfirst($category->category) }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -101,7 +101,6 @@
                             <p class="text-muted"><small><a href="{{ url('post') }}/{{ $post['post_id'] }}">{{ $post['time'] }}</a></small></p>
                         </div>
                         
-                        @if(Auth::user()->id == $post['user_id'])
                         <div class="dropdown">
 
                             <a class="dropdown-toggle dropdown-toggle" href="https://example.com" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -109,11 +108,14 @@
                             </a>
 
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" x-placement="bottom-start" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 35px, 0px);">
-                                <a class="dropdown-item" href="#" >Edit</a>
+                                @if(Auth::user()->id == $post['user_id'])
+                                <a id="{{ $post['post_id'] }}" class="dropdown-item" href="javascript: void(0);" >Edit</a>
                                 <a id="{{ $post['post_id'] }}" class="dropdown-item" href="javascript: void(0);" onclick="deletePost()">Delete</a>
+                                @endif
+                                <a id="{{ $post['post_id'] }}" class="dropdown-item" href="javascript: void(0);" data-toggle="modal" data-target="#con-close-modal" onclick="report()" >Report</a>
                             </div>
                         </div>
-                        @endif
+
                     </div>
                 </div>
 
@@ -184,6 +186,37 @@
 
             <!-- TIMELINE END -->
 
+            <!-- modal start -->
+            <form action="{{ route('post-report') }}" method="POST">
+                <div id="con-close-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">Laporkan postingan</h4>
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                            </div>
+                            <div class="modal-body p-2">
+                                
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="field-3" class="control-label">Alasan</label>
+                                            <input type="text" class="form-control" id="field-3" placeholder="Alasan Pelanggaran">
+                                            <input id="report_id" type="hidden" name="post_id" value="">
+                                            <input type="hidden" name="user_id" value="{{ Auth::user()->id }}">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-danger waves-effect waves-light">Laporkan</button>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- /.modal -->
+            </form>
+
             <div class="text-center load-more">
                 <a href="javascript:void(0);" class="text-danger"><i class="mdi mdi-spin mdi-loading mr-1"></i> Load more </a>
             </div>
@@ -194,6 +227,13 @@
     </div>
 </div>
 @endsection @section('footer')
+
+<script type="text/javascript">
+    function report(){
+        var post_id = $(event.target).attr('id');
+        $('#report_id').val(post_id);
+    }
+</script>
 
 <script type="text/javascript">
     function likePost() {

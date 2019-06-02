@@ -204,7 +204,9 @@ class PostController extends Controller
         } else {
 
             return view('page.index')
-            ->with('categories', $categories);
+                ->with('paginate', $paginate)
+                ->with('title', "Kategori ".ucfirst($cat))
+                ->with('categories', $categories);
         }
 
         if ($request->ajax()) {
@@ -671,6 +673,26 @@ class PostController extends Controller
 
             return $like;
         }
+    }
+
+    public function report(Request $request){
+
+        $post_id = $request->post_id;
+        
+        $report = Report::create([
+            'user_id' => Auth::user()->id,
+            'post_id' => $post_id
+        ]);
+
+        /*if($report){
+            return response()->json([
+                'status' => 200,
+                'data' => null,
+                'message' => 'success'
+            ]);
+        }*/
+
+
     }
 
 }

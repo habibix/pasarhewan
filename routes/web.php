@@ -31,6 +31,7 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::post('/post/delete', 'PostController@destroy');
 
 	Route::post('/post/like', 'PostController@like')->name('post-like');
+	Route::post('/post/report', 'PostController@report')->name('post-report');
 
 	Route::get('/c', 'PostController@category')->name('category');
 	Route::get('/c/{cat}', 'PostController@categoryFilter');
