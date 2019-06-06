@@ -7,7 +7,7 @@ use Auth;
 use App\User;
 use App\Profile;
 use App\Post;
-use App\Image;
+use App\ImageModel;
 use App\Category;
 use App\Comment;
 use Illuminate\Http\Request;

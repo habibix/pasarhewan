@@ -29,7 +29,7 @@ class Post extends Model
 	}
 
 	function image(){
-		return $this->hasMany(Image::class);
+		return $this->hasMany(ImageModel::class);
 	}
 
 	function comment(){

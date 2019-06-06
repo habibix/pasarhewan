@@ -4,12 +4,17 @@ namespace App\Http\Controllers;
 
 use DB;
 use Auth;
+use Storage;
+use Image;
+use File;
+
 use App\Post;
-use App\Image;
+use App\ImageModel;
 use App\User;
 use App\Category;
 use App\Comment;
 use App\Like;
+use App\Report;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
@@ -237,10 +242,49 @@ class PostController extends Controller
      */
     public function store(Request $request) {
 
+        //new
+        /*if ($request->hasFile('post_image')) {
+ 
+            foreach($request->file('post_image') as $file){
+     
+                //get filename with extension
+                $filenamewithextension = $file->getClientOriginalName();
+     
+                //get filename without extension
+                $filename = pathinfo($filenamewithextension, PATHINFO_FILENAME);
+     
+                //get file extension
+                $extension = $file->getClientOriginalExtension();
+     
+                //filename to store
+                $filenametostore = $filename.'_'.uniqid().'.'.$extension;
+
+                // image name mod
+                $image_name = $user_id.'_'.$category_id.'_'.time().'_'.$num.'.'.$img->getClientOriginalExtension();
+     
+                $img->move($path, $image_name);
+
+                Storage::put('public/uploads/'. $filenametostore, fopen($file, 'r+'));
+                Storage::put('public/images/'. $filenametostore, fopen($file, 'r+'));
+     
+                //Resize image here
+                $thumbnailpath = 'public/uploads/'.$filenametostore;
+                $img = Image::make($thumbnailpath)->resize(400, 150, function($constraint) {
+                    $constraint->aspectRatio();
+                });
+                $img->save($thumbnailpath);
+            }
+     
+            //return redirect('images')->with('status', "Image uploaded successfully.");
+            return "ok";
+        }*/
+        //end
+
         $validator = Validator::make($request->all(), [
             'post_category' => 'required',
             'post_text' => 'required_without_all:post_image',
-            'post_image' => 'required_without_all:post_text'
+            'post_image' => 'required_without_all:post_text',
+            'post_image.*' => 'image|mimes:jpeg,png,jpg|max:4096'
         ]);
 
         if ($validator->fails()) {
@@ -250,7 +294,10 @@ class PostController extends Controller
         //retriving data
         $user_id = Auth::user()->id;
         $category_id = $request->post_category;
-        $path = base_path() . '/public/uploads/';
+        $year = date('Y');
+        $month = date('m');
+        $path = base_path() . '/public/uploads/'.$year.'/'.$month.'/';
+        $thumbnailpath = $path.'thumbnail/';
 
         //get post data
         $data = array(
@@ -266,9 +313,9 @@ class PostController extends Controller
         $images = $request->file('post_image');
 
         if(!empty($images)){
-            if(count($images) > 2) {
+            if(count($images) > 3) {
                 //return back()->with('error', 'Failed to find that resource');
-                return Redirect::back()->withErrors(['Sementara upload tidak lebih 2 file']);
+                return Redirect::back()->withErrors(['Sementara upload tidak lebih 3 file']);
             }
 
             $num = 0;
@@ -276,25 +323,44 @@ class PostController extends Controller
             foreach ($images as $image => $img) {
 
                 //naming image
-                $image_name = $user_id.'_'.$category_id.'_'.time().'_'.$num.'.'.$img->getClientOriginalExtension();
+                $image_name = $user_id.'_'.$category_id.'_'.time().'_'.$num.'.'.strtolower($img->getClientOriginalExtension());
+                
+                // create directory if not exist
+                if (!File::isDirectory($thumbnailpath)) {
+                    File::makeDirectory($thumbnailpath);
+                }
 
-                //move image to storage
-                $img->move($path, $image_name);
+                // initialize image
+                $img_compres = Image::make($img);
 
+                // intervension image compress save to storage
+                $img_compres->save($path.$image_name, 50);
+
+                // generate thumbnail save to storage
+                $img_compres->resize(200, 200)->save($thumbnailpath.$image_name, 80);
+
+                // save aspect ratio
+                /*$img_compres->resize(200, 200, function ($constraint) {
+                    $constraint->aspectRatio();
+                })->save($thumbnailpath.$image_name, 80);*/
+
+                //move image to storage (real image)
+                //$img->move($path, $image_name); // original system upload
+                
                 //retriving imag data
                 $dataimage = array (
                     'post_id'       => $post_id,
-                    'image'         => $image_name,
+                    'image'         => $year.'/'.$month.'/'.$image_name,
                 );
 
                 //post image
-                Image::create($dataimage);
+                ImageModel::create($dataimage);
 
                 $num++;
             }
         }
     
-
+        //return $mime;
         return redirect()->route('post.index');
     }
 
@@ -677,12 +743,11 @@ class PostController extends Controller
 
     public function report(Request $request){
 
-        $post_id = $request->post_id;
-        
-        $report = Report::create([
-            'user_id' => Auth::user()->id,
-            'post_id' => $post_id
-        ]);
+            $report = Report::create([
+                'user_id' => Auth::user()->id,
+                'post_id' => $request->post_id,
+                'detail' => $request->detail
+            ]);
 
         /*if($report){
             return response()->json([

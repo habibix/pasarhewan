@@ -1,5 +1,5 @@
 @section('header')
-
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.css">
 @endsection
 
 @extends('layouts.app') @section('content')
@@ -85,6 +85,33 @@
             <!-- TIMELINE START -->
 
             <div id="timeline">
+
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <div class="row">
+                            <a href="https://unsplash.it/1200/768.jpg?image=251" data-toggle="lightbox" data-gallery="example-gallery" class="col-sm-4">
+                                <img src="https://unsplash.it/600.jpg?image=251" class="img-fluid">
+                            </a>
+                            <a href="https://unsplash.it/1200/768.jpg?image=252" data-toggle="lightbox" data-gallery="example-gallery" class="col-sm-4">
+                                <img src="https://unsplash.it/600.jpg?image=252" class="img-fluid">
+                            </a>
+                            <a href="https://unsplash.it/1200/768.jpg?image=253" data-toggle="lightbox" data-gallery="example-gallery" class="col-sm-4">
+                                <img src="https://unsplash.it/600.jpg?image=253" class="img-fluid">
+                            </a>
+                        </div>
+                        <div class="row">
+                            <a href="https://unsplash.it/1200/768.jpg?image=254" data-toggle="lightbox" data-gallery="example-gallery" class="col-sm-4">
+                                <img src="https://unsplash.it/600.jpg?image=254" class="img-fluid">
+                            </a>
+                            <a href="https://unsplash.it/1200/768.jpg?image=255" data-toggle="lightbox" data-gallery="example-gallery" class="col-sm-4">
+                                <img src="https://unsplash.it/600.jpg?image=255" class="img-fluid">
+                            </a>
+                            <a href="https://unsplash.it/1200/768.jpg?image=256" data-toggle="lightbox" data-gallery="example-gallery" class="col-sm-4">
+                                <img src="https://unsplash.it/600.jpg?image=256" class="img-fluid">
+                            </a>
+                        </div>
+                    </div>
+                </div>
 
             @foreach ($posts as $post)
             <div class="card" id="post-{{ $post['post_id'] }}">
@@ -187,7 +214,6 @@
             <!-- TIMELINE END -->
 
             <!-- modal start -->
-            <form action="{{ route('post-report') }}" method="POST">
                 <div id="con-close-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
                     <div class="modal-dialog">
                         <div class="modal-content">
@@ -196,12 +222,11 @@
                                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                             </div>
                             <div class="modal-body p-2">
-                                
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="form-group">
                                             <label for="field-3" class="control-label">Alasan</label>
-                                            <input type="text" class="form-control" id="field-3" placeholder="Alasan Pelanggaran">
+                                            <input name="detail-report" type="text" class="form-control" id="field-3" placeholder="Alasan Pelanggaran">
                                             <input id="report_id" type="hidden" name="post_id" value="">
                                             <input type="hidden" name="user_id" value="{{ Auth::user()->id }}">
                                         </div>
@@ -210,12 +235,11 @@
                                 
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-danger waves-effect waves-light">Laporkan</button>
+                                <button type="button" class="btn btn-danger waves-effect waves-light" onclick="reportPost()">Laporkan</button>
                             </div>
                         </div>
                     </div>
                 </div><!-- /.modal -->
-            </form>
 
             <div class="text-center load-more">
                 <a href="javascript:void(0);" class="text-danger"><i class="mdi mdi-spin mdi-loading mr-1"></i> Load more </a>
@@ -354,5 +378,51 @@ $("input[id*=comment-]").keyup(function () {
             }
         });
     }
+</script>
+
+<script type="text/javascript">
+    
+
+    function reportPost(){
+
+        var post_id = $("#report_id").val();
+        var detail = $("input[name$='detail-report']").val();
+
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
+        $.ajax({
+            url: "{{ url('post/report') }}",
+            type: 'POST',
+            data: {
+                post_id: post_id,
+                detail: detail,
+            },
+
+            success: function(data) {
+                console.log(post_id);
+                console.log(data);
+                $('#con-close-modal').modal('hide');
+            },
+
+            error: function(data) {
+                console.log("error " + data);
+            }
+        });
+    }
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.min.js"></script>
+
+<script>
+$( document ).ready(function() {
+    $(document).on('click', '[data-toggle="lightbox"]', function(event) {
+        event.preventDefault();
+        $(this).ekkoLightbox();
+    });
+});
 </script>
 @endsection

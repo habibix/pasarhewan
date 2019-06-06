@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use DB;
 use Auth;
 use App\Post;
-use App\Image;
+use App\ImageModel;
 use App\User;
 use App\Category;
 use App\Comment;
