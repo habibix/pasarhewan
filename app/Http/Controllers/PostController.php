@@ -283,8 +283,8 @@ class PostController extends Controller
         $validator = Validator::make($request->all(), [
             'post_category' => 'required',
             'post_text' => 'required_without_all:post_image',
-            'post_image' => 'required_without_all:post_text',
-            'post_image.*' => 'image|mimes:jpeg,png,jpg|max:4096'
+            'post_image' => 'required_without_all:post_text|max:6144',
+            'post_image.*' => 'image|mimes:jpeg,png,jpg|max:6144'
         ]);
 
         if ($validator->fails()) {
@@ -333,8 +333,14 @@ class PostController extends Controller
                 // initialize image
                 $img_compres = Image::make($img);
 
-                // intervension image compress save to storage
-                $img_compres->save($path.$image_name, 50);
+                if($img_compres->width() > 960){
+                    $img_compres->resize(960, null, function ($constraint) {
+                        $constraint->aspectRatio();
+                    })->save($path.$image_name, 80);
+                } else {
+                    // intervension image compress save to storage
+                    $img_compres->save($path.$image_name, 60);
+                }
 
                 // generate thumbnail save to storage
                 $img_compres->resize(200, 200)->save($thumbnailpath.$image_name, 80);
