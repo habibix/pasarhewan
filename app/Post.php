@@ -9,7 +9,7 @@ class Post extends Model
     protected $table = 'post';
 
     protected $fillable = [
-        'user_id', 'category_id', 'post_content'
+        'user_id', 'category_id', 'post_content', 'post_price', 'post_type', 'post_sell_title'
     ];
 
     public static function insertPost($postdata)

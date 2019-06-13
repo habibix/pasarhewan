@@ -108,7 +108,7 @@ class PostController extends Controller
         //$posts = Post::paginate(5);
 
         $categories = Category::all();
-        $posts = Post::orderBy('created_at', 'DESC')->paginate(10);
+        $posts = Post::orderBy('created_at', 'DESC')->paginate(3);
         $user_id = Auth::user()->id;
 
         $paginate = [
@@ -133,6 +133,9 @@ class PostController extends Controller
                 'user_full_name' => $post->user->name.' '.$post->user->name_second,
                 'category' => $post->category->category,
                 'post_content' => $post->post_content,
+                'post_sell_title' => $post->post_sell_title,
+                'post_type' => $post->post_type,
+                'post_price' => $post->post_price,
                 'time' => $this->timeAgo($post->created_at),
                 'image' => $image,
                 'liked' => $liked
@@ -242,74 +245,56 @@ class PostController extends Controller
      */
     public function store(Request $request) {
 
-        //new
-        /*if ($request->hasFile('post_image')) {
- 
-            foreach($request->file('post_image') as $file){
-     
-                //get filename with extension
-                $filenamewithextension = $file->getClientOriginalName();
-     
-                //get filename without extension
-                $filename = pathinfo($filenamewithextension, PATHINFO_FILENAME);
-     
-                //get file extension
-                $extension = $file->getClientOriginalExtension();
-     
-                //filename to store
-                $filenametostore = $filename.'_'.uniqid().'.'.$extension;
+        if($request->post_type == 'sell'){
+            $validator = Validator::make($request->all(), [
+                'post_category' => 'required',
+                'post_price' => 'required|max:50',
+                'post_title' => 'required|max:50',
+                'post_text' => 'required',
+                'post_image' => 'required|max:6144',
+                'post_image.*' => 'image|mimes:jpeg,png,jpg|max:6144'
+            ]);
 
-                // image name mod
-                $image_name = $user_id.'_'.$category_id.'_'.time().'_'.$num.'.'.$img->getClientOriginalExtension();
-     
-                $img->move($path, $image_name);
-
-                Storage::put('public/uploads/'. $filenametostore, fopen($file, 'r+'));
-                Storage::put('public/images/'. $filenametostore, fopen($file, 'r+'));
-     
-                //Resize image here
-                $thumbnailpath = 'public/uploads/'.$filenametostore;
-                $img = Image::make($thumbnailpath)->resize(400, 150, function($constraint) {
-                    $constraint->aspectRatio();
-                });
-                $img->save($thumbnailpath);
+            if ($validator->fails()) {
+                return Redirect::back()->withErrors($validator);
             }
-     
-            //return redirect('images')->with('status', "Image uploaded successfully.");
-            return "ok";
-        }*/
-        //end
+        } else {
+            $validator = Validator::make($request->all(), [
+                'post_category' => 'required',
+                'post_text' => 'required_without_all:post_image',
+                'post_image' => 'required_without_all:post_text|max:6144',
+                'post_image.*' => 'image|mimes:jpeg,png,jpg|max:6144'
+            ]);
 
-        $validator = Validator::make($request->all(), [
-            'post_category' => 'required',
-            'post_text' => 'required_without_all:post_image',
-            'post_image' => 'required_without_all:post_text|max:6144',
-            'post_image.*' => 'image|mimes:jpeg,png,jpg|max:6144'
-        ]);
-
-        if ($validator->fails()) {
-            return Redirect::back()->withErrors($validator);
+            if ($validator->fails()) {
+                return Redirect::back()->withErrors($validator);
+            }
         }
 
-        //retriving data
+        // retriving data
         $user_id = Auth::user()->id;
         $category_id = $request->post_category;
+
+        // prepare directory
         $year = date('Y');
         $month = date('m');
-        $path = base_path() . '/public/uploads/'.$year.'/'.$month.'/';
-        $thumbnailpath = $path.'thumbnail/';
+        $path = base_path() . '/public/images/post/'.$year.'/'.$month.'/';
+        $thumbnailpath = base_path() . '/public/images/thumbnail/'.$year.'/'.$month.'/';
 
         //get post data
         $data = array(
             'user_id'       => $user_id,
             'post_content'  => $request->post_text,
+            'post_sell_title'   => $request->post_title,
+            'post_price'    => $request->post_price,
+            'post_type'     => $request->post_type,
             'category_id'   => $category_id
         );
 
-        //insert post data
+        // insert post data
         $post_id = Post::insertPost($data);
      
-        //get post images
+        // get post images
         $images = $request->file('post_image');
 
         if(!empty($images)){
@@ -322,12 +307,19 @@ class PostController extends Controller
             //retriving post images
             foreach ($images as $image => $img) {
 
+
+
                 //naming image
-                $image_name = $user_id.'_'.$category_id.'_'.time().'_'.$num.'.'.strtolower($img->getClientOriginalExtension());
+                $image_name = $user_id.'_'.$post_id.'_'.time().'_'.$num.'.'.strtolower($img->getClientOriginalExtension());
                 
                 // create directory if not exist
+
+                if (!File::isDirectory($path)) {
+                    File::makeDirectory($path, 0777,true);
+                }                
+
                 if (!File::isDirectory($thumbnailpath)) {
-                    File::makeDirectory($thumbnailpath);
+                    File::makeDirectory($thumbnailpath, 0777,true);
                 }
 
                 // initialize image
@@ -339,11 +331,13 @@ class PostController extends Controller
                     })->save($path.$image_name, 80);
                 } else {
                     // intervension image compress save to storage
-                    $img_compres->save($path.$image_name, 60);
+                    $img_compres->save($path.$image_name, 80);
                 }
 
                 // generate thumbnail save to storage
-                $img_compres->resize(200, 200)->save($thumbnailpath.$image_name, 80);
+                $img_compres->resize(200, 200, function ($constraint) {
+                    $constraint->aspectRatio();
+                })->save($thumbnailpath.$image_name, 80);
 
                 // save aspect ratio
                 /*$img_compres->resize(200, 200, function ($constraint) {
@@ -363,6 +357,7 @@ class PostController extends Controller
                 ImageModel::create($dataimage);
 
                 $num++;
+
             }
         }
     
@@ -472,15 +467,31 @@ class PostController extends Controller
     public function destroy(Request $request)
     {
         $post = Post::findOrFail($request->post_id);
+        $post_image = $post->image;
+
+        $path = 'uploads/';
+
+        //return $post_image;
 
         if($post->user_id == Auth::user()->id){
             $post = $post->delete();
+            
             if($post) {
                 return response()->json([
                     'status' => 200,
                     'data' => $post,
                     'message' => 'success'
                 ]);
+            }
+
+            foreach ($post_image as $key => $value) {
+                $image = $value['image'];
+
+                if(file_exists(public_path($path.$image))){
+                  unlink(public_path($path.$image));
+                }else{
+                    dd('File does not exists.');
+                }
             }
         }
         

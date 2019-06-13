@@ -1,5 +1,6 @@
 @section('header')
 <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.css">
+<link href="{{ asset('css/rating.css') }}" rel="stylesheet" type="text/css" />
 @endsection
 
 @extends('layouts.app') @section('content')
@@ -10,75 +11,111 @@
 
     <div class="d-flex justify-content-center">
         <div class="col-lg-6 col-lx-6">
-
-            <div class="card">
-                <div class="card-header">
-                    Create Post
-                </div>
-
-                <div class="card-body">
-
-                    @if (session('status'))
-                    <div class="alert alert-success">
-                        {{ session('status') }}
+            @if (session('status'))
+            <div class="alert alert-success">
+                {{ session('status') }}
+            </div>
+            @endif @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+            @endif
+            <div class="card-box">
+        <ul class="nav nav-pills navtab-bg nav-justified">
+            <li class="nav-item">
+                <a href="#aboutme" data-toggle="tab" aria-expanded="false" class="nav-link active">
+                    Update Status
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#sell" data-toggle="tab" aria-expanded="true" class="nav-link">
+                    Jual
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#settings" data-toggle="tab" aria-expanded="false" class="nav-link">
+                    Settings
+                </a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane active" id="aboutme">
+                <form action="{{ route('post.store') }}" method="POST" enctype="multipart/form-data">
+                    <input name="_token" type="hidden" value="{{ csrf_token() }}">
+                    <input name="post_type" type="hidden" value="status">
+                    <div class="form-group">
+                        <textarea name="post_text" id="" cols="30" rows="2" class="form-control" placeholder="Tulis yang anda pikirkan"></textarea>
                     </div>
-                    @endif @if ($errors->any())
-                    <div class="alert alert-danger">
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
+
+                    <div class="form-group">
+                        <select name="post_category" class="form-control">
+                            <option>-- Kategori --</option>
+                            @foreach ($categories as $category)
+                            <option value="{{ $category->id }}">{{ ucfirst($category->category) }}</option>
                             @endforeach
-                        </ul>
+                        </select>
                     </div>
-                    @endif
 
-                    <form action="{{ route('post.store') }}" method="POST" enctype="multipart/form-data">
-                        <input name="_token" type="hidden" value="{{ csrf_token() }}">
-                        <div class="form-group">
-                            <textarea name="post_text" id="" cols="30" rows="2" class="form-control"></textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <select name="post_category" class="form-control">
-                                <option>-- Kategori --</option>
-                                @foreach ($categories as $category)
-                                <option value="{{ $category->id }}">{{ ucfirst($category->category) }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label for="file">Photo</label>
-                            <input name="post_image[]" type="file" multiple id="gallery-photo-add" class="form-control-file">
-                            <div class="gallery"></div>
-                        </div>
-                </div>
-                <div class="card-footer text-muted">
-                    <button type="submit" class="btn btn-primary float-right">Post</button>
-                </div>
+                    <div class="form-group mb-3">
+                        <label for="file">Photo</label>
+                        <input name="post_image[]" type="file" multiple id="gallery-photo-add" class="form-control-file">
+                        <div class="gallery mt-2"></div>
+                    </div>
+                    <div class="form-group align-right">
+                        <button type="submit" class="btn btn-primary">Post</button>
+                    </div>
                 </form>
+            </div> <!-- end tab-pane -->
+            <!-- end about me section content -->
+
+            <div class="tab-pane" id="sell">
+
+                <form action="{{ route('post.store') }}" method="POST" enctype="multipart/form-data">
+                    <input name="_token" type="hidden" value="{{ csrf_token() }}">
+                    <input name="post_type" type="hidden" value="sell">
+                    <div class="form-group">
+                        <input type="text" name="post_title" class="form-control" placeholder="Jual apa?">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" name="post_price" class="form-control" placeholder="Berapa harganya?">
+                    </div>
+                    <div class="form-group">
+                        <textarea name="post_text" id="" cols="30" rows="2" class="form-control" placeholder="Keterangan?"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <select name="post_category" class="form-control">
+                            <option>-- Kategori --</option>
+                            @foreach ($categories as $category)
+                            <option value="{{ $category->id }}">{{ ucfirst($category->category) }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="file">Photo</label>
+                        <input name="post_image[]" type="file" multiple id="gallery-photo-sell" class="form-control-file">
+                        <div class="gallery mt-2"></div>
+                    </div>
+                    <div class="form-group align-right">
+                        <button type="submit" class="btn btn-primary">Post</button>
+                    </div>
+                </form>
+
             </div>
+            <!-- end timeline content-->
 
-            <div class="card text-center">
-                <div class="card-header">
-                    <ul class="nav nav-pills card-header-pills">
-                        <li class="nav-item float-right">
-                            <a class="nav-link card-link text-custom" href="/">Semua</a>
-                        </li>
-
-                        @foreach ($categories as $category)
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{url('c')}}/{{ $category->category }}">{{ ucfirst($category->category) }}</a>
-                        </li>
-                        @endforeach
-
-                        <li class="nav-item float-right">
-                            <a class="nav-link card-link text-custom" href="{{ url('/c') }}">Lihat Selengkapnya</a>
-                        </li>
-                    </ul>
-                </div>
-
+            <div class="tab-pane" id="settings">
+                Setting
             </div>
+            <!-- end settings content-->
+
+        </div> <!-- end tab-content -->
+    </div> <!-- end card-box-->
 
             @if(!empty($posts))
 
@@ -86,127 +123,192 @@
 
             <div id="timeline">
 
-                <div class="row justify-content-center">
-                    <div class="col-md-8">
-                        <div class="row">
-                            <a href="https://unsplash.it/1200/768.jpg?image=251" data-toggle="lightbox" data-gallery="example-gallery" class="col-sm-4">
-                                <img src="https://unsplash.it/600.jpg?image=251" class="img-fluid">
-                            </a>
-                            <a href="https://unsplash.it/1200/768.jpg?image=252" data-toggle="lightbox" data-gallery="example-gallery" class="col-sm-4">
-                                <img src="https://unsplash.it/600.jpg?image=252" class="img-fluid">
-                            </a>
-                            <a href="https://unsplash.it/1200/768.jpg?image=253" data-toggle="lightbox" data-gallery="example-gallery" class="col-sm-4">
-                                <img src="https://unsplash.it/600.jpg?image=253" class="img-fluid">
-                            </a>
-                        </div>
-                        <div class="row">
-                            <a href="https://unsplash.it/1200/768.jpg?image=254" data-toggle="lightbox" data-gallery="example-gallery" class="col-sm-4">
-                                <img src="https://unsplash.it/600.jpg?image=254" class="img-fluid">
-                            </a>
-                            <a href="https://unsplash.it/1200/768.jpg?image=255" data-toggle="lightbox" data-gallery="example-gallery" class="col-sm-4">
-                                <img src="https://unsplash.it/600.jpg?image=255" class="img-fluid">
-                            </a>
-                            <a href="https://unsplash.it/1200/768.jpg?image=256" data-toggle="lightbox" data-gallery="example-gallery" class="col-sm-4">
-                                <img src="https://unsplash.it/600.jpg?image=256" class="img-fluid">
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
             @foreach ($posts as $post)
-            <div class="card" id="post-{{ $post['post_id'] }}">
-                <div class="card-body">
-
+            @if($post['post_type'] == 'sell')
+            <!-- sell -->
+                <div class="card-box product-box" id="post-{{ $post['post_id'] }}">
                     <div class="media">
 
-                        @if($post['profile_image'] != NULL)
-                        <img class="mr-2 avatar-sm rounded-circle" src="{{ $post['profile_image'] }}" alt="Generic placeholder image"> @else
-                        <img class="mr-2 avatar-sm rounded-circle" src="https://3.bp.blogspot.com/-LPjYeDMJi5o/XOUSqoN6G9I/AAAAAAAADj8/8qM42tR95xsn-X556dFIUiJQKJc1de-5wCLcBGAs/s1600/blank-profile.jpg" alt="Generic placeholder image"> @endif
+                            @if($post['profile_image'] != NULL)
+                                <img class="mr-2 avatar-sm rounded-circle" src="{{ $post['profile_image'] }}" alt="Image profile"> 
+                            @else
+                                <img class="mr-2 avatar-sm rounded-circle" src="https://3.bp.blogspot.com/-LPjYeDMJi5o/XOUSqoN6G9I/AAAAAAAADj8/8qM42tR95xsn-X556dFIUiJQKJc1de-5wCLcBGAs/s1600/blank-profile.jpg" alt="Generic placeholder image">
+                            @endif
 
-                        <div class="media-body">
-                            <h5 class="m-0"><a href="{{ url('profile') }}/{{ $post['user_id'] }}">{{ $post['user_full_name'] }}</a></h5>
-                            <p class="text-muted"><small><a href="{{ url('post') }}/{{ $post['post_id'] }}">{{ $post['time'] }}</a></small></p>
+                            <div class="media-body">
+                                <h5 class="m-0">
+                                    <a href="{{ url('profile') }}/{{ $post['user_id'] }}">{{ $post['user_full_name'] }}</a>
+                                </h5>
+                                <p class="text-muted">
+                                    <small><a href="{{ url('post') }}/{{ $post['post_id'] }}">{{ $post['time'] }}</a></small>
+                                </p>
+                            </div>
+                            
+                            <div class="dropdown">
+
+                                <a class="dropdown-toggle dropdown-toggle" href="https://example.com" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="mdi mdi-dots-horizontal mdi-24px"></i>
+                                </a>
+
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" x-placement="bottom-start" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 35px, 0px);">
+                                    @if(Auth::user()->id == $post['user_id'])
+                                    <a id="{{ $post['post_id'] }}" class="dropdown-item" href="javascript: void(0);" >Edit</a>
+                                    <a id="{{ $post['post_id'] }}" class="dropdown-item" href="javascript: void(0);" onclick="deletePost()">Delete</a>
+                                    @endif
+                                    <a id="{{ $post['post_id'] }}" class="dropdown-item" href="javascript: void(0);" data-toggle="modal" data-target="#con-close-modal" onclick="report()" >Report</a>
+                                </div>
+                            </div>
+
                         </div>
+                    <div class="product-action">
                         
-                        <div class="dropdown">
+                    </div>
 
-                            <a class="dropdown-toggle dropdown-toggle" href="https://example.com" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="mdi mdi-dots-horizontal mdi-24px"></i>
-                            </a>
+                    <div>
 
-                            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" x-placement="bottom-start" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 35px, 0px);">
-                                @if(Auth::user()->id == $post['user_id'])
-                                <a id="{{ $post['post_id'] }}" class="dropdown-item" href="javascript: void(0);" >Edit</a>
-                                <a id="{{ $post['post_id'] }}" class="dropdown-item" href="javascript: void(0);" onclick="deletePost()">Delete</a>
-                                @endif
-                                <a id="{{ $post['post_id'] }}" class="dropdown-item" href="javascript: void(0);" data-toggle="modal" data-target="#con-close-modal" onclick="report()" >Report</a>
+                        @foreach($post['image'] as $key => $value)
+                            @if($key > 0)
+                                
+                                <a id="show-{{ $post['post_id'] }}" href="{{ url('images/post') }}/{{ $value['image'] }}" data-toggle="lightbox" data-gallery="post-{{ $post['post_id'] }}" style="display: none;">
+                                    <img src="{{ url('images/post') }}/{{ $value['image'] }}" class="img-fluid">
+                                </a>
+
+                            @else
+
+                            <a id="show-{{ $post['post_id'] }}" href="{{ url('images/post') }}/{{ $value['image'] }}" data-toggle="lightbox" data-gallery="post-{{ $post['post_id'] }}">
+                                    <img src="{{ url('images/post') }}/{{ $value['image'] }}" class="img-fluid">
+                                </a>
+                                                        
+                            @endif
+                            
+                        @endforeach
+
+                        
+
+                    </div>
+
+                    <div class="product-info">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h5 class="font-16 mt-0 sp-line-1"><a href="{{ url('post') }}/{{ $post['post_id'] }}" class="text-dark">{{ $post['post_sell_title'] }}</a> </h5>
+                                <div class="text-warning mb-2 font-13">
+                                    <div class='starrr' id='star2'></div>
+                                    <br />
+                                </div>
+                                <h5 class="m-0"> 
+                                    <span class="text-muted"> <a href="{{ url('profile') }}/{{ $post['user_id'] }}" class="text-dark">{{ $post['user_full_name'] }}</a></span>
+                                </h5>
+                            </div>
+                            <div class="col-auto">
+                                <div class="product-price-tag">
+                                    Rp. {{ $post['post_price'] }}
+                                </div>
+                            </div>
+                        </div> <!-- end row -->
+                    </div> <!-- end product info-->
+                </div>
+            <!-- end sell -->
+            @else
+                <div class="card" id="post-{{ $post['post_id'] }}">
+                    <div class="card-body">
+
+                        <div class="media">
+
+                            @if($post['profile_image'] != NULL)
+                                <img class="mr-2 avatar-sm rounded-circle" src="{{ $post['profile_image'] }}" alt="Image profile"> 
+                            @else
+                                <img class="mr-2 avatar-sm rounded-circle" src="https://3.bp.blogspot.com/-LPjYeDMJi5o/XOUSqoN6G9I/AAAAAAAADj8/8qM42tR95xsn-X556dFIUiJQKJc1de-5wCLcBGAs/s1600/blank-profile.jpg" alt="Generic placeholder image">
+                            @endif
+
+                            <div class="media-body">
+                                <h5 class="m-0">
+                                    <a href="{{ url('profile') }}/{{ $post['user_id'] }}">{{ $post['user_full_name'] }}</a>
+                                </h5>
+                                <p class="text-muted">
+                                    <small><a href="{{ url('post') }}/{{ $post['post_id'] }}">{{ $post['time'] }}</a></small>
+                                </p>
+                            </div>
+                            
+                            <div class="dropdown">
+
+                                <a class="dropdown-toggle dropdown-toggle" href="https://example.com" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="mdi mdi-dots-horizontal mdi-24px"></i>
+                                </a>
+
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" x-placement="bottom-start" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 35px, 0px);">
+                                    @if(Auth::user()->id == $post['user_id'])
+                                    <a id="{{ $post['post_id'] }}" class="dropdown-item" href="javascript: void(0);" >Edit</a>
+                                    <a id="{{ $post['post_id'] }}" class="dropdown-item" href="javascript: void(0);" onclick="deletePost()">Delete</a>
+                                    @endif
+                                    <a id="{{ $post['post_id'] }}" class="dropdown-item" href="javascript: void(0);" data-toggle="modal" data-target="#con-close-modal" onclick="report()" >Report</a>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    @if(count($post['image']) > 0 )
+
+                    <div class="row image-galery">
+                        
+                        @foreach($post['image'] as $key => $value)
+                            @if($key > 0)
+                                
+                                    <a id="show-{{ $post['post_id'] }}" href="{{ config('global.image_dir') }}/{{ $value['image'] }}" data-toggle="lightbox" data-gallery="post-{{ $post['post_id'] }}" class="col-sm-12" style="display: none;">
+                                        <img src="{{ url('images/post') }}/{{ $value['image'] }}" class="img-fluid">
+                                    </a>
+
+                            @else
+
+                            <a id="show-{{ $post['post_id'] }}" href="{{ config('global.image_dir') }}/{{ $value['image'] }}" data-toggle="lightbox" data-gallery="post-{{ $post['post_id'] }}" class="col-sm-12">
+                                    <img src="{{ url('images/post') }}/{{ $value['image'] }}" class="img-fluid">
+                                </a>
+                                                        
+                            @endif
+                            
+                        @endforeach
+
+                    </div>
+
+                    @endif 
+
+                    @if(!empty($post['post_content']))
+                    <div class="content-text mt-2">
+                        <p class="card-text">{{ $post['post_content'] }}</p>
+                    </div>
+                    @endif
+
+                    <div class="mt-1 mb-1 align-right">
+                        <a id="post-{{ $post['post_id'] }}" href="javascript: void(0);" class="btn btn-sm btn-link text-muted"><i class="mdi mdi-reply"></i> Reply</a>
+                        @if($post['liked'] == 1)
+                            <a id="post-{{ $post['post_id'] }}" onclick="likePost()" href="javascript: void(0);" class="btn btn-sm btn-link text-muted"><i id="icon-{{ $post['post_id']}}" class="mdi mdi-heart icon-pink"></i> Like</a>
+                        @else
+                            <a id="post-{{ $post['post_id'] }}" onclick="likePost()" href="javascript: void(0);" class="btn btn-sm btn-link text-muted"><i id="icon-{{ $post['post_id']}}" class="mdi mdi-heart-outline"></i> Like</a>
+                        @endif
+                        
+                        <a id="post-{{ $post['post_id'] }}" href="javascript: void(0);" class="btn btn-sm btn-link text-muted"><i class="mdi mdi-share-variant"></i> Share</a>
+                    </div>
+
+                    <div class="card-footer" style="padding-top: 6px;">
+                        <div class="media mt-2">
+                            <div class="media-body">
+                                <form method="post" action="{{ url('/comment') }}">
+                                    <div id="comment-{{$post['post_id']}}" class="input-group">
+                                        <input name="user_id" type="hidden" value="{{ Auth::user()->id }}">
+                                        <input name="post_id" type="hidden" value="{{ $post['post_id'] }}">
+                                        <input name="_token" type="hidden" value="{{ csrf_token() }}">
+                                        <input id="comment-{{$post['post_id']}}" name="comment_content" type="text" class="form-control" placeholder="Add Comment" aria-label="Add Comment">
+                                        <div class="input-group-append">
+                                            <button type="submit" class="btn btn-primary waves-effect waves-light" type="button" disabled>Send</button>
+                                        </div>
+                                    </div>
+                                </form>
                             </div>
                         </div>
-
                     </div>
                 </div>
-
-                @if(count($post['image']) > 0 )
-
-                <div id="carouselExample" class="carousel slide" data-ride="carousel">
-                    <ol class="carousel-indicators">
-                        @foreach($post['image'] as $key => $value) @if($key == 0 )
-                        <li data-target="#carouselExample" data-slide-to="{{ $key }}" class="active"></li>
-                        @else
-                        <li data-target="#carouselExample" data-slide-to="{{ $key }}"></li>
-                        @endif @endforeach
-                        <!-- <li data-target="#carouselExample" data-slide-to="0" class="active"></li>
-                                <li data-target="#carouselExample" data-slide-to="1"></li> -->
-                    </ol>
-                    <div class="carousel-inner" role="listbox">
-                        @foreach($post['image'] as $key => $value) @if($key == 0 )
-                        <div class="carousel-item active">
-                            <img class="d-block img-fluid" src="{{ asset('uploads') }}/{{ $value['image'] }}" alt="First slide">
-                        </div>
-                        @else
-                        <div class="carousel-item">
-                            <img class="d-block img-fluid" src="{{ asset('uploads') }}/{{ $value['image'] }}" alt="First slide">
-                        </div>
-                        @endif @endforeach
-
-                    </div>
-                </div>
-
-                @endif @if(!empty($post['post_content']))
-                <div class="content-text mt-2">
-                    <p class="card-text">{{ $post['post_content'] }}</p>
-                </div>
-                @endif
-
-                <div class="mt-1 mb-1 align-right">
-                    <a id="post-{{ $post['post_id'] }}" href="javascript: void(0);" class="btn btn-sm btn-link text-muted"><i class="mdi mdi-reply"></i> Reply</a>
-                    @if($post['liked'] == 1)
-                        <a id="post-{{ $post['post_id'] }}" onclick="likePost()" href="javascript: void(0);" class="btn btn-sm btn-link text-muted"><i id="icon-{{ $post['post_id']}}" class="mdi mdi-heart icon-pink"></i> Like</a>
-                    @else
-                        <a id="post-{{ $post['post_id'] }}" onclick="likePost()" href="javascript: void(0);" class="btn btn-sm btn-link text-muted"><i id="icon-{{ $post['post_id']}}" class="mdi mdi-heart-outline"></i> Like</a>
-                    @endif
-                    
-                    <a id="post-{{ $post['post_id'] }}" href="javascript: void(0);" class="btn btn-sm btn-link text-muted"><i class="mdi mdi-share-variant"></i> Share</a>
-                </div>
-
-                <div class="card-footer" style="padding-top: 6px;">
-                    <div class="media mt-2">
-                        <div class="media-body">
-                            <form method="post" action="{{ url('/comment') }}">
-                                <div id="comment-{{$post['post_id']}}" class="input-group">
-                                    <input name="user_id" type="hidden" value="{{ Auth::user()->id }}">
-                                    <input name="post_id" type="hidden" value="{{ $post['post_id'] }}">
-                                    <input name="_token" type="hidden" value="{{ csrf_token() }}">
-                                    <input id="comment-{{$post['post_id']}}" name="comment_content" type="text" class="form-control" placeholder="Add Comment" aria-label="Add Comment">
-                                    <div class="input-group-append">
-                                        <button type="submit" class="btn btn-primary waves-effect waves-light" type="button" disabled>Send</button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            @endif
+                
             @endforeach
 
             </div>
@@ -245,12 +347,19 @@
                 <a href="javascript:void(0);" class="text-danger"><i class="mdi mdi-spin mdi-loading mr-1"></i> Load more </a>
             </div>
 
-            @else Belum ada postingan @endif
+            @else
+
+                Belum ada postingan 
+
+            @endif
 
         </div>
     </div>
 </div>
 @endsection @section('footer')
+
+<link href="{{ asset('css/app.min.css') }}" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="{{ asset('js/rating.js') }}"></script>
 
 <script type="text/javascript">
     function report(){
@@ -313,7 +422,7 @@ $("input[id*=comment-]").keyup(function () {
 </script>
 
 <script type="text/javascript">
-    var page = 1;
+    var page = 2;
     $(window).scroll(function() {
         if($(window).scrollTop() + $(window).height() >= $(document).height()) {
             if (page > {{ $paginate['last_page'] }} ) {
@@ -332,7 +441,7 @@ $("input[id*=comment-]").keyup(function () {
                 url: '?page=' + page,
                 type: "get",
                 beforeSend: function()
-                {
+                {   
                     $('.load-more').show();
                 }
             })
@@ -371,6 +480,8 @@ $("input[id*=comment-]").keyup(function () {
                 if(data.data == true){
                     $('#post-'+post_id).remove();
                 }
+
+                console.log(data);
             },
 
             error: function(data) {
@@ -425,4 +536,27 @@ $( document ).ready(function() {
     });
 });
 </script>
+<script>
+    $('#star1').starrr({
+      change: function(e, value){
+        if (value) {
+          $('.your-choice-was').show();
+          $('.choice').text(value);
+        } else {
+          $('.your-choice-was').hide();
+        }
+      }
+    });
+
+    var $s2input = $('#star2_input');
+    $('#star2').starrr({
+      max: 5,
+      rating: $s2input.val(),
+      change: function(e, value){
+        //$s2input.val(value).trigger('input');
+        console.log("star "+ value);
+      }
+    });
+  </script>
+
 @endsection

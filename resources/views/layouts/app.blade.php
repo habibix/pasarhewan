@@ -71,7 +71,7 @@
                         var reader = new FileReader();
 
                         reader.onload = function(event) {
-                            $($.parseHTML('<img width="100">')).attr('src', event.target.result).appendTo(placeToInsertImagePreview);
+                            $($.parseHTML('<img class="col-md-4 p-0">')).attr('src', event.target.result).appendTo(placeToInsertImagePreview);
                         }
 
                         reader.readAsDataURL(input.files[i]);
@@ -81,6 +81,10 @@
             };
 
             $('#gallery-photo-add').on('change', function() {
+                imagesPreview(this, 'div.gallery');
+            });
+
+            $('#gallery-photo-sell').on('change', function() {
                 imagesPreview(this, 'div.gallery');
             });
         });

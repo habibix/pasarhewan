@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Hash;
 use Auth;
+use Image;
+
 use App\User;
 use App\Profile;
 use App\Post;
@@ -13,6 +15,7 @@ use App\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Input;
 
 class ProfilController extends Controller
 {
@@ -89,8 +92,6 @@ class ProfilController extends Controller
 
         $user_post = Post::where('user_id', '=', $id)->orderBy('created_at', 'DESC')->get();
         $data_post = [];
-        
-
 
         //$user_post = $user_post->image;
 
@@ -165,15 +166,25 @@ class ProfilController extends Controller
                 // base path location
                 $path = base_path() . '/public/images/profile';
                 // naming image
-                $image_name = $id.'_'.time().'.'.$img->getClientOriginalExtension();
+                $image_name = $id.'_profile'.'.'.$img->getClientOriginalExtension();
                 // imagepath url
                 $imagePath = url('/images/profile').'/'.$image_name;
+
+                // compress image fit to 200px
+                //$img_compres = Image::make($img)->fit(200)->save($path.$image_name);
+                $img_compres = Image::make($img);
+
+                $img_compres->fit(200)->save($path.'/'.$image_name, 80);
+
                 // move image to storage
-                $img->move($path, $image_name);
+                //$img->move($path, $image_name);
 
                 //save to db
-                $user->image_profile =$imagePath;
+                $user->image_profile = $imagePath;
                 $user->save();
+
+                //return $img_compres->response();
+
             }
             
             $user->name = $request->firstname;

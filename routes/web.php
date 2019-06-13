@@ -51,8 +51,12 @@ Route::group(['middleware' => 'auth'], function () {
 
 
 /*Route::get('/test', function(){
-	$like = Like::where('post_id', 22)->where('user_id', 3)->first();
-    return $like;
+	$year = date('Y');
+    $month = date('m');
+	$path = base_path() . '/public/images/'.$year.'/'.$month.'/';
+	if (!File::isDirectory($path)) {
+                    File::makeDirectory($path, 0777,true);
+                }   
 });*/
 //Route::get('/profile/{id}', 'ProfilController@profile')->name('profile');
 //Route::get('/profile/edit/{id}', 'ProfilController@editProfile')->name('edit-profile');

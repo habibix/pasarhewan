@@ -1,15 +1,15 @@
 # validator input
 
-# move image to user id folder
- move like_post to comment table
+move image to user id folder
+move like_post to comment table
 
-# fix comment + like
+fix comment + like
 # edit post
 
 # optimalkan post feed jadikan 1 fungsi saja
 # fix notifikasi
 
-# judul tab dinamik
+judul tab dinamik
 
 # add search fitur
 
@@ -23,6 +23,7 @@
 - auto love saat komen
 
 #add recaptcha
-
 6Lf_O6cUAAAAAEfzWGiu61Be1hirHXfWUfbHem3e (client)
 6Lf_O6cUAAAAAPgHq3fvDu9zWHvJ30aCoq8LyZAM (server)
+
+#fix global variable path
