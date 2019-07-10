@@ -50,14 +50,17 @@ Route::group(['middleware' => 'auth'], function () {
 });
 
 
-/*Route::get('/test', function(){
-	$year = date('Y');
+Route::get('/test', function(){
+	/*$year = date('Y');
     $month = date('m');
 	$path = base_path() . '/public/images/'.$year.'/'.$month.'/';
 	if (!File::isDirectory($path)) {
-                    File::makeDirectory($path, 0777,true);
-                }   
-});*/
+        File::makeDirectory($path, 0777,true);
+    }*/
+
+    /*$path = 'images/post';
+    echo public_path($path.$image);*/
+});
 //Route::get('/profile/{id}', 'ProfilController@profile')->name('profile');
 //Route::get('/profile/edit/{id}', 'ProfilController@editProfile')->name('edit-profile');
 

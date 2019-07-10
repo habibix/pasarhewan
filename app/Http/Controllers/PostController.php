@@ -441,9 +441,29 @@ class PostController extends Controller
      * @param  \App\post  $post
      * @return \Illuminate\Http\Response
      */
-    public function edit(post $post)
-    {
-        //
+    public function edit($post) {
+
+        $categories = Category::all();
+        $post = Post::find($post);
+
+        if($post->post_type == 'sell'){
+            $view = view('page.edit-sell-data', compact('post', 'categories'))->render();
+            return response()->json(['html' => $view]);
+        } else {
+            $view = view('page.edit-status-data', compact('post', 'categories'))->render();
+            return response()->json(['html' => $view]);
+        }
+
+        /*if (ajax()) {
+            $view = view('page.edit-status-data', compact('post', 'categories'))->render();
+            return response()->json(['html' => $view]);
+        }*/
+
+        /*return response()->json([
+            'status' => 200,
+            'data' => $post,
+            'message' => 'success'
+        ]);*/
     }
 
     /**
@@ -469,7 +489,7 @@ class PostController extends Controller
         $post = Post::findOrFail($request->post_id);
         $post_image = $post->image;
 
-        $path = 'uploads/';
+        $path = 'images/post/';
 
         //return $post_image;
 
@@ -477,22 +497,21 @@ class PostController extends Controller
             $post = $post->delete();
             
             if($post) {
-                return response()->json([
-                    'status' => 200,
-                    'data' => $post,
-                    'message' => 'success'
-                ]);
-            }
+            
+                foreach ($post_image as $key => $value) {
+                    $image = $value['image'];
 
-            foreach ($post_image as $key => $value) {
-                $image = $value['image'];
-
-                if(file_exists(public_path($path.$image))){
-                  unlink(public_path($path.$image));
-                }else{
-                    dd('File does not exists.');
+                    if(file_exists(public_path($path.$image))){
+                      unlink(public_path($path.$image));
+                    }
                 }
             }
+
+            return response()->json([
+                'status' => 200,
+                'data' => $post,
+                'message' => 'success'
+            ]);
         }
         
         /*if(!User::destroy($id)) return redirect()->back();

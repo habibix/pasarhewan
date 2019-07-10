@@ -152,10 +152,12 @@
 
                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" x-placement="bottom-start" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 35px, 0px);">
                                     @if(Auth::user()->id == $post['user_id'])
-                                    <a id="{{ $post['post_id'] }}" class="dropdown-item" href="javascript: void(0);" >Edit</a>
-                                    <a id="{{ $post['post_id'] }}" class="dropdown-item" href="javascript: void(0);" onclick="deletePost()">Delete</a>
+                                        <a id="{{ $post['post_id'] }}" class="dropdown-item" href="javascript: void(0);" onclick="editPost()">Edit</a>
+                                        <a id="{{ $post['post_id'] }}" class="dropdown-item" href="javascript: void(0);" onclick="deletePost()">Delete</a>
+                                    @else
+                                        <a id="{{ $post['post_id'] }}" class="dropdown-item" href="javascript: void(0);" data-toggle="modal" data-target="#con-close-modal" onclick="report()" >Report</a>
                                     @endif
-                                    <a id="{{ $post['post_id'] }}" class="dropdown-item" href="javascript: void(0);" data-toggle="modal" data-target="#con-close-modal" onclick="report()" >Report</a>
+                                    
                                 </div>
                             </div>
 
@@ -237,10 +239,11 @@
 
                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" x-placement="bottom-start" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 35px, 0px);">
                                     @if(Auth::user()->id == $post['user_id'])
-                                    <a id="{{ $post['post_id'] }}" class="dropdown-item" href="javascript: void(0);" >Edit</a>
-                                    <a id="{{ $post['post_id'] }}" class="dropdown-item" href="javascript: void(0);" onclick="deletePost()">Delete</a>
+                                        <a id="{{ $post['post_id'] }}" class="dropdown-item" href="javascript: void(0);" onclick="editPost()">Edit</a>
+                                        <a id="{{ $post['post_id'] }}" class="dropdown-item" href="javascript: void(0);" onclick="deletePost()">Delete</a>
+                                    @else
+                                        <a id="{{ $post['post_id'] }}" class="dropdown-item" href="javascript: void(0);" data-toggle="modal" data-target="#con-close-modal" onclick="report()" >Report</a>
                                     @endif
-                                    <a id="{{ $post['post_id'] }}" class="dropdown-item" href="javascript: void(0);" data-toggle="modal" data-target="#con-close-modal" onclick="report()" >Report</a>
                                 </div>
                             </div>
 
@@ -254,13 +257,13 @@
                         @foreach($post['image'] as $key => $value)
                             @if($key > 0)
                                 
-                                    <a id="show-{{ $post['post_id'] }}" href="{{ config('global.image_dir') }}/{{ $value['image'] }}" data-toggle="lightbox" data-gallery="post-{{ $post['post_id'] }}" class="col-sm-12" style="display: none;">
+                                    <a id="show-{{ $post['post_id'] }}" href="{{ url('images/post') }}/{{ $value['image'] }}" data-toggle="lightbox" data-gallery="post-{{ $post['post_id'] }}" class="col-sm-12" style="display: none;">
                                         <img src="{{ url('images/post') }}/{{ $value['image'] }}" class="img-fluid">
                                     </a>
 
                             @else
 
-                            <a id="show-{{ $post['post_id'] }}" href="{{ config('global.image_dir') }}/{{ $value['image'] }}" data-toggle="lightbox" data-gallery="post-{{ $post['post_id'] }}" class="col-sm-12">
+                            <a id="show-{{ $post['post_id'] }}" href="{{ url('images/post') }}/{{ $value['image'] }}" data-toggle="lightbox" data-gallery="post-{{ $post['post_id'] }}" class="col-sm-12">
                                     <img src="{{ url('images/post') }}/{{ $value['image'] }}" class="img-fluid">
                                 </a>
                                                         
@@ -341,7 +344,77 @@
                             </div>
                         </div>
                     </div>
-                </div><!-- /.modal -->
+                </div>
+
+                <div id="con-edit-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">Laporkan postingan</h4>
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                            </div>
+                            <div class="modal-body p-2">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="field-3" class="control-label">Alasan</label>
+                                            <input name="detail-report" type="text" class="form-control" id="field-3" placeholder="Alasan Pelanggaran">
+                                            <input id="report_id" type="hidden" name="post_id" value="">
+                                            <input type="hidden" name="user_id" value="{{ Auth::user()->id }}">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-danger waves-effect waves-light" onclick="reportPost()">Laporkan</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.modal -->
+
+                <!-- modal edit -->
+                <!-- <div id="con-edit-modal" class="modal fade show" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="display: block; padding-right: 15px;" aria-modal="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="card-box">
+                            <form action="{{ url('post') }}" method="PUT" enctype="multipart/form-data">
+                                <input name="_token" type="hidden" value="{{ csrf_token() }}">
+                                <input name="post_type" type="hidden" value="sell">
+                                <div class="form-group">
+                                    <input type="text" name="post_title" class="form-control" placeholder="Jual apa?">
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" name="post_price" class="form-control" placeholder="Berapa harganya?">
+                                </div>
+                                <div class="form-group">
+                                    <textarea name="post_text" id="" cols="30" rows="2" class="form-control" placeholder="Keterangan?"></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <select name="post_category" class="form-control">
+                                        <option>-- Kategori --</option>
+                                        @foreach ($categories as $category)
+                                        <option value="{{ $category->id }}">{{ ucfirst($category->category) }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label for="file">Photo</label>
+                                    <input name="post_image[]" type="file" multiple id="gallery-photo-sell" class="form-control-file">
+                                    <div class="gallery mt-2"></div>
+                                </div>
+                                <div class="form-group align-right">
+                                    <button type="submit" class="btn btn-primary">Post</button>
+                                </div>
+                            </form>
+                        </div>
+                        </div>
+                    </div>
+                </div> -->
+                <!-- modal edit end -->
 
             <div class="text-center load-more">
                 <a href="javascript:void(0);" class="text-danger"><i class="mdi mdi-spin mdi-loading mr-1"></i> Load more </a>
@@ -549,7 +622,7 @@ $( document ).ready(function() {
     });
 
     var $s2input = $('#star2_input');
-    $('#star2').starrr({
+    $('[id=star2]').starrr({
       max: 5,
       rating: $s2input.val(),
       change: function(e, value){
@@ -558,5 +631,27 @@ $( document ).ready(function() {
       }
     });
   </script>
+
+<script type="text/javascript">
+    function editPost(){
+
+        var post_id = $(event.target).attr('id');
+        console.log(post_id);
+
+        $.ajax({
+            url: "{{ url('/') }}/post/"+post_id+"/edit",
+            type: 'GET',
+
+            success: function(data) {
+                $('#con-close-modal').modal('show');
+                console.log('show');
+            },
+
+            error: function(data) {
+                console.log("error " + data);
+            }
+        });
+    }
+</script>
 
 @endsection
